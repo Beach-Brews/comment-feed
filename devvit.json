@@ -1,0 +1,46 @@
+{
+  "$schema": "https://developers.reddit.com/schema/config-file.v1.json",
+  "name": "commentlist",
+  "post": {
+    "dir": "dist/client",
+    "entrypoints": {
+      "default": {
+        "inline": true,
+        "entry": "hub.html"
+      },
+      "expanded": {
+        "entry": "expanded.html"
+      }
+    }
+  },
+  "server": {
+    "dir": "dist/server",
+    "entry": "index.cjs"
+  },
+  "menu": {
+    "items": [
+      {
+        "label": "Create Comment List",
+        "description": "Comment List",
+        "location": "subreddit",
+        "forUserType": "moderator",
+        "endpoint": "/internal/menu/post-create"
+      }
+    ]
+  },
+  "triggers": {
+    "onAppInstall": "/internal/triggers/on-app-install",
+    "onAppUpgrade": "/internal/triggers/on-app-upgrade",
+    "onCommentCreate": "/internal/triggers/on-comment-create",
+    "onCommentDelete": "/internal/triggers/on-comment-delete",
+    "onAutomoderatorFilterComment": "/internal/triggers/on-automoderator-filter-comment",
+    "onModAction": "/internal/triggers/on-mod-action"
+  },
+  "scripts": {
+    "dev": "vite build --watch",
+    "build": "vite build"
+  },
+  "dev": {
+    "subreddit": "beachbrewsboil"
+  }
+}
