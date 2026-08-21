@@ -1,46 +1,82 @@
 {
-  "$schema": "https://developers.reddit.com/schema/config-file.v1.json",
-  "name": "commentlist",
-  "post": {
-    "dir": "dist/client",
-    "entrypoints": {
-      "default": {
-        "inline": true,
-        "entry": "hub.html"
-      },
-      "expanded": {
-        "entry": "expanded.html"
-      }
+    "$schema": "https://developers.reddit.com/schema/config-file.v1.json",
+    "name": "commentlist",
+    "post": {
+        "dir": "dist/client",
+        "entrypoints": {
+            "default": {
+                "inline": true,
+                "entry": "hub.html",
+                "height": "tall"
+            },
+            "expanded": {
+                "entry": "expanded.html"
+            }
+        }
+    },
+    "server": {
+        "dir": "dist/server",
+        "entry": "index.cjs"
+    },
+    "menu": {
+        "items": [
+            {
+                "label": "Create Comment List",
+                "description": "Comment List",
+                "location": "subreddit",
+                "forUserType": "moderator",
+                "endpoint": "/internal/menu/post-create"
+            }
+        ]
+    },
+    "triggers": {
+        "onAppInstall": "/internal/triggers/on-app-install",
+        "onAppUpgrade": "/internal/triggers/on-app-upgrade"
+    },
+    "settings": {
+        "subreddit": {
+            "commentCount": {
+                "type": "number",
+                "label": "Comment Count",
+                "helpText": "The max number of comments the app tracks at once",
+                "defaultValue": 1000,
+                "validationEndpoint": "/internal/settings/validate-comment-count"
+            },
+            "logLevel": {
+                "type": "select",
+                "label": "Log Level",
+                "helpText": "Controls the level of log messages. Warn (default) should be used for performance reasons. The app developer may have you change the log level if receiving support.",
+                "defaultValue": "Warn",
+                "options": [
+                    {
+                        "label": "Error",
+                        "value": "Error"
+                    },
+                    {
+                        "label": "Warn",
+                        "value": "Warn"
+                    },
+                    {
+                        "label": "Info",
+                        "value": "Info"
+                    },
+                    {
+                        "label": "Debug",
+                        "value": "Debug"
+                    },
+                    {
+                        "label": "Trace",
+                        "value": "Trace"
+                    }
+                ]
+            }
+        }
+    },
+    "scripts": {
+        "dev": "vite build --watch",
+        "build": "vite build"
+    },
+    "dev": {
+        "subreddit": "beachbrewsboil"
     }
-  },
-  "server": {
-    "dir": "dist/server",
-    "entry": "index.cjs"
-  },
-  "menu": {
-    "items": [
-      {
-        "label": "Create Comment List",
-        "description": "Comment List",
-        "location": "subreddit",
-        "forUserType": "moderator",
-        "endpoint": "/internal/menu/post-create"
-      }
-    ]
-  },
-  "triggers": {
-    "onAppInstall": "/internal/triggers/on-app-install",
-    "onAppUpgrade": "/internal/triggers/on-app-upgrade",
-    "onCommentCreate": "/internal/triggers/on-comment-create",
-    "onCommentDelete": "/internal/triggers/on-comment-delete",
-    "onAutomoderatorFilterComment": "/internal/triggers/on-automoderator-filter-comment",
-    "onModAction": "/internal/triggers/on-mod-action"
-  },
-  "scripts": {
-    "dev": "vite build --watch",
-    "build": "vite build"
-  },
-  "dev": {
-    "subreddit": "beachbrewsboil"
-  }
 }

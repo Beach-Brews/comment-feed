@@ -12,18 +12,24 @@ import {
     useState,
     useCallback,
     useEffect,
-    MouseEvent
+    MouseEvent, Fragment
 } from 'react';
 import { createRoot } from 'react-dom/client';
-import { SubDefaultIcon } from '../shared/CustomIcons';
+import { SubDefaultIcon, UpvoteIcon, DownvoteIcon, ShareIcon } from '../shared/CustomIcons';
 import { LoadingSpinner } from '../shared/LoadingSpinner';
-import { navigateTo, context } from '@devvit/web/client';
-import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/solid';
+import { navigateTo, context, requestExpandedMode } from '@devvit/web/client';
+import {
+    ChevronLeftIcon,
+    ChevronRightIcon,
+    ArrowsPointingOutIcon
+} from '@heroicons/react/24/solid';
 import {
     ApiResponse,
     CommentDto,
     InitializeHubResponse,
-    Pagination
+    Pagination,
+    PostInfoDto,
+    UserInfoDto,
 } from '../../shared/api';
 import { formatRelativeDateTime } from '../shared/dateFormat';
 
@@ -38,70 +44,92 @@ const openLink = (e: MouseEvent, path: string) => {
 };
 
 export const CommentHubCard = ({
-    comment
+    comment,
+    post,
+    author
 }: {
-    comment: CommentDto
+    comment: CommentDto,
+    post: PostInfoDto | undefined,
+    author: UserInfoDto | undefined
 }) => {
-    const { user } = comment;
     const [defaultSnoo] = useState<string>(() => `https://www.redditstatic.com/avatars/defaults/v2/avatar_default_${Math.floor(Math.random() * 8)}.png`);
     return (
         <div
             onClick={(e) => {
-                openLink(e, `/r/${context.subredditName}/comments/${comment.post.id}/comment/${comment.id}`)
+                openLink(
+                    e,
+                    `/r/${context.subredditName}/comments/${comment.postId}/comment/${comment.id}`
+                );
             }}
-            className="flex gap-2 p-4 text-sm rounded-xl hover:cursor-pointer hover:bg-neutral-background-hovered"
+            className="w-full flex gap-2 p-4 text-sm rounded-xl hover:cursor-pointer hover:bg-neutral-background-hovered"
         >
             <div className="shrink-0 size-8 object-contain overflow-hidden rounded-full">
                 <img
                     src={
-                        user?.snoovar !== undefined && user.snoovar.length > 0
-                            ? user.snoovar
+                        author?.snoovatar !== undefined &&
+                        author.snoovatar.length > 0
+                            ? author.snoovatar
                             : defaultSnoo
                     }
-                    alt={user.username}
+                    alt={comment.authorName}
                 />
             </div>
-            <div className="flex flex-col gap-2">
+            <div className="flex-1 min-w-0 flex flex-col gap-2">
                 <div className="text-neutral-content-weak">
                     <a
                         href="#"
                         className="link-strong"
-                        onClick={(e) =>
-                            openLink(e, `/u/${comment.user.username}`)
-                        }
+                        onClick={(e) => openLink(e, `/u/${comment.authorName}`)}
                     >
-                        {comment.user.username}
+                        {comment.authorName}
                     </a>
                     &nbsp;
-                    {comment.replyTo ? (
+                    {comment.replyAuthorName ? (
                         <>
                             replied to&nbsp;
                             <a
                                 href="#"
                                 className="link-strong"
                                 onClick={(e) =>
-                                    openLink(e, `/u/${comment.replyTo}`)
+                                    openLink(e, `/u/${comment.replyAuthorName}`)
                                 }
                             >
-                                {comment.replyTo}
+                                {comment.replyAuthorName}
                             </a>
                         </>
                     ) : (
                         <>commented</>
                     )}
                     &nbsp;
-                    {formatRelativeDateTime(comment.date)}
+                    {formatRelativeDateTime(comment.createdAt)}
                 </div>
                 <a
                     href="#"
                     onClick={(e) =>
-                        openLink(e,`/r/${context.subredditName}/comments/${comment.post.id}`)
+                        openLink(
+                            e,
+                            `/r/${context.subredditName}/comments/${comment.postId}`
+                        )
                     }
                     className="text-neutral-content line-clamp-2"
                 >
-                    {comment.post.title}
+                    {post?.title ?? '[deleted]'}
                 </a>
-                <div className="text-neutral-content-strong line-clamp-3">{comment.body}</div>
+                <div className="text-neutral-content-strong line-clamp-3">
+                    {comment.body}
+                </div>
+                <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-1 text-neutral-content-weakest">
+                            <UpvoteIcon />
+                            <span className="text-neutral-content-strong">{comment.score}</span>
+                            <DownvoteIcon />
+                        </div>
+                    </div>
+                    <div className="flex justify-end items-center gap-2">
+
+                    </div>
+                </div>
             </div>
         </div>
     );
@@ -157,9 +185,9 @@ export const Hub = () => {
         void initHub();
     }, [updatePagination]);
 
-    // const launchExpanded = useCallback((e: MouseEvent) => {
-    //     requestExpandedMode(e.nativeEvent as PointerEvent, 'editor');
-    // }, []);
+    const launchExpanded = useCallback((e: MouseEvent) => {
+        requestExpandedMode(e.nativeEvent as PointerEvent, 'expanded');
+    }, []);
 
     // Handle loading or error
     if (!hubInit) {
@@ -190,9 +218,9 @@ export const Hub = () => {
     }
 
     return (
-        <div className="w-full h-screen overflow-auto">
-            <div className="container max-w-screen-lg min-h-screen mx-auto flex flex-col relative z-0 h-full">
-                <div className="flex justify-between items-center gap-2 p-2">
+        <div className="w-full h-full overflow-hidden">
+            <div className="container mx-auto flex flex-col relative z-0 h-full">
+                <div className="flex justify-between items-center gap-2 p-2 border-b border-b-neutral-border">
                     <div className="flex justify-start items-center gap-2">
                         <div className="w-8 h-8 shrink-0 object-contain overflow-hidden rounded-full">
                             {hubInit.subInfo.icon ? (
@@ -210,6 +238,12 @@ export const Hub = () => {
                             r/{hubInit.subInfo.name} Comments
                         </h1>
                     </div>
+                    <button
+                        className="rounded-full h-10 p-2 ml-auto font-semibold text-sm cursor-pointer text-center text-neutral-content-strong hover:bg-secondary-background-hovered"
+                        onClick={launchExpanded}
+                    >
+                        <ArrowsPointingOutIcon className="size-6" />
+                    </button>
                 </div>
                 {/* No comments */}
                 {hubInit && hubInit.comments.length <= 0 ? (
@@ -221,8 +255,29 @@ export const Hub = () => {
                     </div>
                 ) : (
                     <>
-                        {/* Pagination + Comment List */}
-                        <div className="text-xs xs:text-base flex justify-between items-center p-2 gap-2 border-b border-b-neutral-border">
+                        <div className="flex-1 relative grow h-[0%]">
+                            <div className="flex flex-col gap-1 p-2 h-full overflow-hidden">
+                                {pagination.comments.length > 0 ? (
+                                    pagination.comments.map((s) => (
+                                        <Fragment key={'card' + s.id}>
+                                            <CommentHubCard
+                                                key={s.id}
+                                                comment={s}
+                                                post={hubInit.posts[s.postId]}
+                                                author={hubInit.users[s.authorName]}
+                                            />
+                                            <div
+                                                id={'sep' + s.id}
+                                                className="h-px shrink-0 w-full bg-neutral-border-weak"
+                                            ></div>
+                                        </Fragment>
+                                    ))
+                                ) : (
+                                    <div>There are no comments.</div>
+                                )}
+                            </div>
+                        </div>
+                        <div className="text-xs xs:text-base flex justify-between items-center p-2 gap-2 border-t border-t-neutral-border">
                             <div className="flex justify-start items-center gap-1 xs:gap-2"></div>
                             <div className="flex justify-end items-center gap-2">
                                 <div>
@@ -269,20 +324,6 @@ export const Hub = () => {
                                 >
                                     <ChevronRightIcon className="size-5" />
                                 </button>
-                            </div>
-                        </div>
-                        <div className="relative grow h-[0%]">
-                            <div className="flex flex-col gap-1 p-2 h-full overflow-hidden">
-                                {pagination.comments.length > 0 ? (
-                                    pagination.comments.map((s) => (
-                                        <>
-                                            <CommentHubCard key={s.id} comment={s} />
-                                            <div id={'sep'+s.id} className="h-px w-full bg-neutral-border-weak"></div>
-                                        </>
-                                    ))
-                                ) : (
-                                    <div>There are no comments.</div>
-                                )}
                             </div>
                         </div>
                     </>

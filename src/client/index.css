@@ -392,6 +392,7 @@ html {
     --color-neutral-content-strong: var(--neutral-content-strong);
     --color-neutral-content: var(--neutral-content);
     --color-neutral-content-weak: var(--neutral-content-weak);
+    --color-neutral-content-weakest: var(--neutral-content-weakest);
     --color-neutral-background-strong: var(--neutral-background-strong);
     --color-neutral-background: var(--neutral-background);
     --color-neutral-background-weak: var(--neutral-background-weak);
@@ -726,6 +727,7 @@ html {
     --neutral-content-strong: var(--puregray-850);
     --neutral-content: var(--puregray-650);
     --neutral-content-weak: var(--puregray-525);
+    --neutral-content-weakest: var(--puregray-400);
     --neutral-background-strong: var(--global-white);
     --neutral-background: var(--global-white);
     --neutral-background-weak: var(--puregray-50);
@@ -863,6 +865,7 @@ html {
         --neutral-content-strong: var(--puregray-100);
         --neutral-content: var(--puregray-350);
         --neutral-content-weak: var(--puregray-450);
+        --neutral-content-weakest: var(--puregray-550);
         --neutral-background-strong: var(--puregray-850);
         --neutral-background: var(--puregray-900);
         --neutral-background-weak: var(--puregray-950);

@@ -7,7 +7,7 @@
 
 import { defineMock } from 'vite-plugin-mock-dev-server';
 import { ApiResponse, InitializeHubResponse } from '../../shared/api';
-import { SampleSubInfo, SampleCommentList } from './mockData';
+import { BrewsSampleComments } from './brewsComments';
 
 // noinspection JSUnusedGlobalSymbols
 export default defineMock([
@@ -17,10 +17,7 @@ export default defineMock([
         body: {
             code: 200,
             message: 'OK',
-            result: {
-                comments: SampleCommentList,
-                subInfo: SampleSubInfo
-            }
+            result: BrewsSampleComments
         } satisfies ApiResponse<InitializeHubResponse>
     }
 ]);

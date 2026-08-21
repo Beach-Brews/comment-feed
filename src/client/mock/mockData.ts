@@ -6,12 +6,21 @@
  */
 
 import { CommentDto, UserInfoDto, SubredditInfoDto } from '../../shared/api';
+import { T1, T3 } from '../../shared/types';
+
+const genUid = () => {
+    return (
+        Date.now().toString(36).substring(3) +
+        Math.random().toString(36).substring(2, 7)
+    );
+};
+const genT1 = () => `t1_${genUid()}` as T1;
+const genT3 = () => `t3_${genUid()}` as T3;
 
 export const SampleUserInfo = {
-    username: 'Beach-Brews',
-    userId: 't2_ds8dkw924l',
-    snoovar:
-        'https://i.redd.it/snoovatar/avatars/39b6f849-b2de-4c8f-9c97-4946152dc878.png',
+    // username: 'Beach-Brews',
+    // userId: 't2_ds8dkw924l',
+    snoovatar: 'https://i.redd.it/snoovatar/avatars/39b6f849-b2de-4c8f-9c97-4946152dc878.png',
 } satisfies UserInfoDto;
 
 export const SampleSubInfo = {
@@ -19,60 +28,30 @@ export const SampleSubInfo = {
     icon: 'https://styles.redditmedia.com/t5_gb360m/styles/communityIcon_m6nsf08mkobg1.png?width=64&height=64&frame=1&auto=webp&crop=64%3A64%2Csmart&s=8a8bcbc4ceb6438f1f573c94b86f0a6e77c8dacc',
 } satisfies SubredditInfoDto;
 
+/*
+
+    id: `t1_${string}`;
+    postId: `t3_${string}`;
+    authorName: string;
+    replyAuthorName: string | null;
+    body: string;
+    createdAt: number;
+    score: number;
+    edited: boolean;
+    locked: boolean;
+    permalink: string;
+ */
 export const SampleCommentList = [
     {
-        id: 't1_test',
-        post: {
-            id: 't3_test',
-            title: 'Test Post Title',
-        },
-        replyTo: null,
-        body: 'This is a sample comment',
-        user: SampleUserInfo,
-        date: Date.now(),
-    },
-    {
-        id: 't1_test',
-        post: {
-            id: 't3_test',
-            title: 'Test Post Title',
-        },
-        replyTo: null,
-        body: 'This is a sample comment',
-        user: SampleUserInfo,
-        date: Date.now(),
-    },
-    {
-        id: 't1_test',
-        post: {
-            id: 't3_test',
-            title: 'Test Post Title That Is Really Long To See How Line Wrapping Works With Long Post Titles Where People Ramble On About Nothing',
-        },
-        replyTo: 'Delightful-Peach1832',
-        body: 'This is a sample comment. it can span over multiple lines. Dude, does markdown work or what? How is formatted comments displayed to me?',
-        user: SampleUserInfo,
-        date: Date.now(),
-    },
-    {
-        id: 't1_test',
-        post: {
-            id: 't3_test',
-            title: 'Test Post Title',
-        },
-        replyTo: null,
-        body: 'This is a sample comment',
-        user: SampleUserInfo,
-        date: Date.now(),
-    },
-    {
-        id: 't1_test',
-        post: {
-            id: 't3_test',
-            title: 'Test Post Title',
-        },
-        replyTo: null,
-        body: 'This is a sample comment',
-        user: SampleUserInfo,
-        date: Date.now(),
+        id: genT1(),
+        postId: genT3(),
+        authorName: 'beach-brews',
+        replyAuthorName: null,
+        body: 'Hello',
+        createdAt: Date.now(),
+        score: 12,
+        edited: false,
+        locked: false,
+        permalink: 'idk what goes here'
     },
 ] satisfies CommentDto[];

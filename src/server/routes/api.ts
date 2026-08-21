@@ -1,93 +1,66 @@
+/*!
+ * Defines API endpoints from the app client.
+ *
+ * Author: u/Beach-Brews
+ * License: BSD-3-Clause
+ */
+
 import { Hono } from 'hono';
-import { context, redis, reddit } from '@devvit/web/server';
-import type {
-  DecrementResponse,
-  IncrementResponse,
-  InitResponse,
-} from '../../shared/api';
+import { reddit } from '@devvit/web/server';
+import type { ApiResponse, InitializeHubResponse } from '../../shared/api';
+import { getCommentInfoByIds } from '../utils/commentUtils';
 
 type ErrorResponse = {
-  status: 'error';
-  message: string;
+    status: 'error';
+    message: string;
 };
 
 export const api = new Hono();
 
-api.get('/init', async (c) => {
-  const { postId } = context;
+api.get('/hub/init', async (c) => {
+    try {
+        // TODO: Allow mods to force a cache skip
+        // TODO: Add cache
 
-  if (!postId) {
-    console.error('API Init Error: postId not found in devvit context');
-    return c.json<ErrorResponse>(
-      {
-        status: 'error',
-        message: 'postId is required but missing from context',
-      },
-      400
-    );
-  }
+        // TODO: Get from redis sorted set
+        const tempComments = await reddit
+            .getCommentsByUser({
+                username: 'beach-brews',
+                sort: 'new',
+                limit: 10,
+                pageSize: 10,
+            })
+            .all();
+        const commentIds = tempComments.map((c) => c.id);
 
-  try {
-    const [count, username] = await Promise.all([
-      redis.get('count'),
-      reddit.getCurrentUsername(),
-    ]);
+        // Get subreddit and comment info
+        const [currentSub, commentData] = await Promise.all([
+            reddit.getCurrentSubreddit(),
+            getCommentInfoByIds(commentIds),
+        ]);
 
-    return c.json<InitResponse>({
-      type: 'init',
-      postId: postId,
-      count: count ? parseInt(count) : 0,
-      username: username ?? 'anonymous',
-    });
-  } catch (error) {
-    console.error(`API Init Error for post ${postId}:`, error);
-    let errorMessage = 'Unknown error during initialization';
-    if (error instanceof Error) {
-      errorMessage = `Initialization failed: ${error.message}`;
+        return c.json<ApiResponse<InitializeHubResponse>>({
+            code: 200,
+            message: 'OK',
+            result: {
+                users: commentData.users,
+                posts: commentData.posts,
+                comments: commentData.comments,
+                subInfo: {
+                    name: currentSub.name,
+                    icon: currentSub.settings.communityIcon,
+                },
+            },
+        });
+    } catch (error) {
+        console.error(`Hub Init Error:`, error);
+        let errorMessage = 'Unknown error during hub initialization';
+        if (error instanceof Error) {
+            errorMessage = `Hub initialization failed: ${error.message}`;
+        }
+        return c.json<ErrorResponse>(
+            { status: 'error', message: errorMessage },
+            400
+        );
     }
-    return c.json<ErrorResponse>(
-      { status: 'error', message: errorMessage },
-      400
-    );
-  }
-});
-
-api.post('/increment', async (c) => {
-  const { postId } = context;
-  if (!postId) {
-    return c.json<ErrorResponse>(
-      {
-        status: 'error',
-        message: 'postId is required',
-      },
-      400
-    );
-  }
-
-  const count = await redis.incrBy('count', 1);
-  return c.json<IncrementResponse>({
-    count,
-    postId,
-    type: 'increment',
-  });
-});
-
-api.post('/decrement', async (c) => {
-  const { postId } = context;
-  if (!postId) {
-    return c.json<ErrorResponse>(
-      {
-        status: 'error',
-        message: 'postId is required',
-      },
-      400
-    );
-  }
-
-  const count = await redis.incrBy('count', -1);
-  return c.json<DecrementResponse>({
-    count,
-    postId,
-    type: 'decrement',
-  });
 });

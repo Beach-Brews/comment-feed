@@ -1,0 +1,159 @@
+﻿import { InitializeHubResponse } from '../../shared/api';
+
+export const BrewsSampleComments = {
+    'users': {
+        'Beach-Brews': {
+            'snoovatar':
+                'https://i.redd.it/snoovatar/avatars/39b6f849-b2de-4c8f-9c97-4946152dc878.png',
+        },
+    },
+    'posts': {
+        't3_1vsqkz6': {
+            'title': 'What am I doing wrong?',
+        },
+        't3_1vrt975': {
+            'title':
+                'Tools, toys, and time-savers: Digging into Developer Platform apps',
+        },
+        't3_1vrxs2a': {
+            'title':
+                'Domain exception pending for 4+ days — api.branchtoast.com',
+        },
+    },
+    'comments': [
+        {
+            'id': 't1_p4n8u2a',
+            'postId': 't3_1vsqkz6',
+            'authorName': 'Beach-Brews',
+            'replyAuthorName': 'Efficient-Newt5384',
+            'body': 'It depends on what you are trying to do. Devvit is different from the old Reddit Data-APIs. You do not "run a script" like the old PRAW/Python scripts. Devvit apps are written in TypeScript and run directly on Reddit\'s servers.\n\nSee the [Devvit Overview page](https://developers.reddit.com/docs/capabilities/devvit-web/devvit_web_overview) for a helpful get started overview.',
+            'createdAt': 1787156025000,
+            'score': 2,
+            'edited': false,
+            'locked': false,
+            'permalink':
+                '/r/Devvit/comments/1vsqkz6/what_am_i_doing_wrong/p4n8u2a/',
+        },
+        {
+            'id': 't1_p4ikes5',
+            'postId': 't3_1vrt975',
+            'authorName': 'Beach-Brews',
+            'replyAuthorName': 'SolariaHues',
+            'body': 'Just like I need to get mine in gear for that one project ;)',
+            'createdAt': 1787094675000,
+            'score': 2,
+            'edited': false,
+            'locked': false,
+            'permalink':
+                '/r/ModSupport/comments/1vrt975/tools_toys_and_timesavers_digging_into_developer/p4ikes5/',
+        },
+        {
+            'id': 't1_p4i9w7b',
+            'postId': 't3_1vrt975',
+            'authorName': 'Beach-Brews',
+            'replyAuthorName': 'PossibleCrit',
+            'body': "So many ideas, none of the time :')",
+            'createdAt': 1787091429000,
+            'score': 2,
+            'edited': false,
+            'locked': false,
+            'permalink':
+                '/r/ModSupport/comments/1vrt975/tools_toys_and_timesavers_digging_into_developer/p4i9w7b/',
+        },
+        {
+            'id': 't1_p4ha88a',
+            'postId': 't3_1vrt975',
+            'authorName': 'Beach-Brews',
+            'replyAuthorName': 'GloriouslyGlittery',
+            'body': "You can view a feed of comments on old Reddit (http://old.reddit.com/r/hurricane/comments), but Devvit doesn't have an API for that view exactly. However, I guess it would technically be possible to track the newest 1000 comments or so (after installed). Hmmm: maybe I can throw together this app really quick.",
+            'createdAt': 1787081674000,
+            'score': 5,
+            'edited': false,
+            'locked': false,
+            'permalink':
+                '/r/ModSupport/comments/1vrt975/tools_toys_and_timesavers_digging_into_developer/p4ha88a/',
+        },
+        {
+            'id': 't1_p4gwglx',
+            'postId': 't3_1vrxs2a',
+            'authorName': 'Beach-Brews',
+            'replyAuthorName': null,
+            'body': 'Domain requests have been historically reviewed on Tuesdays. It can take a round or two depending on queue size.',
+            'createdAt': 1787078092000,
+            'score': 4,
+            'edited': false,
+            'locked': false,
+            'permalink':
+                '/r/Devvit/comments/1vrxs2a/domain_exception_pending_for_4_days/p4gwglx/',
+        },
+        {
+            'id': 't1_p4gj7yv',
+            'postId': 't3_1vrt975',
+            'authorName': 'Beach-Brews',
+            'replyAuthorName': 'SampleOfNone',
+            'body': 'Ooooh, I may need to install this on Hurricane! Thanks!',
+            'createdAt': 1787074759000,
+            'score': 2,
+            'edited': false,
+            'locked': false,
+            'permalink':
+                '/r/ModSupport/comments/1vrt975/tools_toys_and_timesavers_digging_into_developer/p4gj7yv/',
+        },
+        {
+            'id': 't1_p4gh58a',
+            'postId': 't3_1vrt975',
+            'authorName': 'Beach-Brews',
+            'replyAuthorName': 'MrsMsPrettyStems',
+            'body': 'Thank you for the feedback! I greatly appreciate it!',
+            'createdAt': 1787074240000,
+            'score': 2,
+            'edited': false,
+            'locked': false,
+            'permalink':
+                '/r/ModSupport/comments/1vrt975/tools_toys_and_timesavers_digging_into_developer/p4gh58a/',
+        },
+        {
+            'id': 't1_p4ggcmv',
+            'postId': 't3_1vrt975',
+            'authorName': 'Beach-Brews',
+            'replyAuthorName': 'MrsMsPrettyStems',
+            'body': "Awesome! Thanks for clarifying. You haven't been the only to ask. I will get a ticket created.",
+            'createdAt': 1787074044000,
+            'score': 2,
+            'edited': false,
+            'locked': false,
+            'permalink':
+                '/r/ModSupport/comments/1vrt975/tools_toys_and_timesavers_digging_into_developer/p4ggcmv/',
+        },
+        {
+            'id': 't1_p4gf7eu',
+            'postId': 't3_1vrt975',
+            'authorName': 'Beach-Brews',
+            'replyAuthorName': 'MrsMsPrettyStems',
+            'body': 'With some changes to Devvit\'s memory limits and now the next "expanded view" for taking surveys, I plan to increase those counts a bit too :)\n\nSorry to repeat, but making sure I understood. Can you clarify the "everyone be able to access it"?',
+            'createdAt': 1787073761000,
+            'score': 2,
+            'edited': false,
+            'locked': false,
+            'permalink':
+                '/r/ModSupport/comments/1vrt975/tools_toys_and_timesavers_digging_into_developer/p4gf7eu/',
+        },
+        {
+            'id': 't1_p4gc5kp',
+            'postId': 't3_1vrt975',
+            'authorName': 'Beach-Brews',
+            'replyAuthorName': 'MrsMsPrettyStems',
+            'body': 'By "everyone be able to access it", do you mean your other co-mods from an authoring perspective? That\'s slotted for a few months out, unfortunately.\n\nYou should be able to add links to your options in the latest version! The options and descriptions allow Markdown, so it follows the standard markdown syntax for links. However, you might still be limited to the character counts (I think it\'s 64 for options?)\n\n```\n[link text](https://your.link/url)\n```',
+            'createdAt': 1787072997000,
+            'score': 3,
+            'edited': false,
+            'locked': false,
+            'permalink':
+                '/r/ModSupport/comments/1vrt975/tools_toys_and_timesavers_digging_into_developer/p4gc5kp/',
+        },
+    ],
+    'subInfo': {
+        'name': 'BeachBrewsBoil',
+        'icon': '',
+    },
+} satisfies InitializeHubResponse;

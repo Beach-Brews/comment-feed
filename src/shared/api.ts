@@ -18,28 +18,66 @@ export type SubredditInfoDto = {
     icon: string | undefined;
 };
 
+/*
+export type FlairDto = {
+    // TODO: handle rich text emoji flairs
+    text?: string | undefined;
+    cssClass?: string | undefined;
+    textColor?: string | undefined;
+    backgroundColor?: string | undefined;
+};
+*/
+
 export type UserInfoDto = {
-    username: string;
-    userId: string;
-    snoovar: string;
+    //username: string;
+    snoovatar: string | undefined;
+    //authorFlair: FlairDto | undefined;
 };
 
-export type PostDto = {
-    id: `t3_${string}`;
+/*
+export type PostModInfoDto = {
+    approved: boolean;
+    removed: boolean;
+    stickied: boolean;
+    spam: boolean;
+    numReports: number;
+    userReportReasons: string[];
+    modReports: [string, string][];
+    modReportReasons: string[];
+    ignoringReports: boolean;
+    collapsedBecauseCrowdControl: boolean;
+};
+*/
+
+export type PostInfoDto = {
     title: string;
 };
 
 export type CommentDto = {
     id: `t1_${string}`;
-    post: PostDto;
-    replyTo: string | null;
-    user: UserInfoDto;
+    postId: `t3_${string}`;
+    authorName: string;
+    replyAuthorName: string | null;
     body: string;
-    date: number;
+    createdAt: number;
+    score: number;
+    edited: boolean;
+    locked: boolean;
+    permalink: string;
+    //distinguishedBy: string | undefined;
+    //modInfo?: PostModInfoDto | undefined;
 };
 
-export type InitializeHubResponse = {
+export type UserNameToUserInfoMap = Record<string, UserInfoDto>;
+export type PostIdToPostInfoMap = Record<string, PostInfoDto>;
+
+export type CommentGroupDto = {
+    users: UserNameToUserInfoMap;
+    posts: PostIdToPostInfoMap;
     comments: CommentDto[];
+};
+
+export type InitializeHubResponse = CommentGroupDto & {
     subInfo: SubredditInfoDto;
 };
 
