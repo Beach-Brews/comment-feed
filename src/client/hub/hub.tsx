@@ -15,7 +15,7 @@ import {
     MouseEvent, Fragment
 } from 'react';
 import { createRoot } from 'react-dom/client';
-import { SubDefaultIcon, UpvoteIcon, DownvoteIcon, ShareIcon } from '../shared/CustomIcons';
+import { SubDefaultIcon, UpvoteIcon, DownvoteIcon } from '../shared/CustomIcons';
 import { LoadingSpinner } from '../shared/LoadingSpinner';
 import { navigateTo, context, requestExpandedMode } from '@devvit/web/client';
 import {

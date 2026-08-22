@@ -6,37 +6,86 @@
  */
 
 import { Hono } from 'hono';
-import { reddit } from '@devvit/web/server';
-import type { ApiResponse, InitializeHubResponse } from '../../shared/api';
+import { context, reddit, scheduler } from '@devvit/web/server';
+import {
+    ApiResponse,
+    InitializeHubResponse,
+    MessageResponse,
+    ModCmdRequest,
+} from '../../shared/api';
 import { getCommentInfoByIds } from '../utils/commentUtils';
-
-type ErrorResponse = {
-    status: 'error';
-    message: string;
-};
+import { Logger } from '../utils/Logger';
+import { clearAllComments, getCommentIdsForPage } from '../utils/redisUtils';
+import { isMod } from '../utils/userUtils';
 
 export const api = new Hono();
 
-api.get('/hub/init', async (c) => {
+api.post('/hub/mod-cmd', async (c) => {
+    const logger = await Logger.Create('API - Hub Mod Command');
     try {
+        // Throw error if not a mod
+        if (!(await isMod()))
+            throw new Error(`User ${context.username} is not a mod.`);
+
+        // Get command
+        const cmd = await c.req.json<ModCmdRequest>();
+        logger.debug('Received mod command: ', cmd);
+
+        switch (cmd.cmd) {
+            case 'preload':
+                // Schedule job
+                await scheduler.runJob({
+                    name: 'preload',
+                    runAt: new Date(Date.now() + 1000 + Math.random() * 3000),
+                });
+                logger.info('Scheduled preload job');
+                break;
+
+            case 'clear':
+                await clearAllComments();
+                logger.info('Cleared all comments');
+                break;
+        }
+
+        return c.json<MessageResponse>(
+            {
+                code: 200,
+                message: 'Preload scheduled',
+                result: undefined
+            },
+            200
+        );
+
+    } catch (error) {
+        logger.error(`Hub Mod Command Error:`, error);
+        return c.json<MessageResponse>(
+            {
+                code: 500,
+                message: error instanceof Error ? error.message : 'Unknown error',
+                result: undefined,
+            },
+            500
+        );
+    }
+});
+
+api.get('/hub/init', async (c) => {
+    const logger = await Logger.Create('API - Hub Init');
+    try {
+        // TODO: Page parameters in query
+        const page = 1;
+        const pageSize = 25
+
         // TODO: Allow mods to force a cache skip
         // TODO: Add cache
 
-        // TODO: Get from redis sorted set
-        const tempComments = await reddit
-            .getCommentsByUser({
-                username: 'beach-brews',
-                sort: 'new',
-                limit: 10,
-                pageSize: 10,
-            })
-            .all();
-        const commentIds = tempComments.map((c) => c.id);
+        // Get comments for page
+        const commentPage = await getCommentIdsForPage(page, pageSize);
 
         // Get subreddit and comment info
         const [currentSub, commentData] = await Promise.all([
             reddit.getCurrentSubreddit(),
-            getCommentInfoByIds(commentIds),
+            getCommentInfoByIds(commentPage.comments),
         ]);
 
         return c.json<ApiResponse<InitializeHubResponse>>({
@@ -53,14 +102,15 @@ api.get('/hub/init', async (c) => {
             },
         });
     } catch (error) {
-        console.error(`Hub Init Error:`, error);
-        let errorMessage = 'Unknown error during hub initialization';
-        if (error instanceof Error) {
-            errorMessage = `Hub initialization failed: ${error.message}`;
-        }
-        return c.json<ErrorResponse>(
-            { status: 'error', message: errorMessage },
-            400
+        logger.error(`Hub Init Error:`, error);
+        return c.json<MessageResponse>({
+                code: 500,
+                message: error instanceof Error
+                    ? error.message
+                    : 'Unknown error',
+                result: undefined
+            },
+            500
         );
     }
 });

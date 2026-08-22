@@ -86,3 +86,7 @@ export type Pagination = {
     pageSize: number;
     total: number;
 };
+
+export type ModCmdRequest = {
+    cmd: 'clear' | 'preload';
+};

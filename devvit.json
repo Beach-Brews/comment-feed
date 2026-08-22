@@ -31,7 +31,18 @@
     },
     "triggers": {
         "onAppInstall": "/internal/triggers/on-app-install",
-        "onAppUpgrade": "/internal/triggers/on-app-upgrade"
+        "onAppUpgrade": "/internal/triggers/on-app-upgrade",
+        "onCommentCreate": "/internal/triggers/on-comment-create",
+        "onCommentDelete": "/internal/triggers/on-comment-delete",
+        "onAutomoderatorFilterComment": "/internal/triggers/on-automoderator-filter-comment",
+        "onModAction": "/internal/triggers/on-mod-action"
+    },
+    "scheduler": {
+        "tasks": {
+            "preload": {
+                "endpoint": "/internal/jobs/preload"
+            }
+        }
     },
     "settings": {
         "subreddit": {

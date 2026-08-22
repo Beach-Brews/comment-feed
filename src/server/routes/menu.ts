@@ -8,11 +8,14 @@
 import { Hono } from 'hono';
 import type { UiResponse } from '@devvit/web/shared';
 import { context, EntrypointHeight, reddit } from '@devvit/web/server';
+import { Logger } from '../utils/Logger';
 
 export const menu = new Hono();
 
 menu.post('/post-create', async (c) => {
+    const logger = await Logger.Create('Menu - Create Hub');
     try {
+        logger.debug('Creating hub post');
         const post = await reddit.submitCustomPost({
             title: `r/${context.subredditName} Comment List`,
             textFallback: {
@@ -25,6 +28,7 @@ menu.post('/post-create', async (c) => {
             },
         });
 
+        logger.info(`Created new hub post: ${post.id}`);
         return c.json<UiResponse>(
             {
                 navigateTo: `https://reddit.com/r/${context.subredditName}/comments/${post.id}`,
@@ -32,12 +36,12 @@ menu.post('/post-create', async (c) => {
             200
         );
     } catch (error) {
-        console.error(`Error creating post: ${error}`);
+        logger.error(`Error creating post: `, error);
         return c.json<UiResponse>(
             {
                 showToast: 'Failed to create post',
             },
-            400
+            500
         );
     }
 });
