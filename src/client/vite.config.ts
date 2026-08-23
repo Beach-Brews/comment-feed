@@ -13,8 +13,7 @@ export default defineConfig({
         sourcemap: true,
         rolldownOptions: {
             input: {
-                hub: resolve(import.meta.dirname, 'hub.html'),
-                expanded: resolve(import.meta.dirname, 'expanded.html'),
+                index: resolve(import.meta.dirname, 'index.html'),
             },
             output: {
                 entryFileNames: '[name].js',

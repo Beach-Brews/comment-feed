@@ -1,4 +1,4 @@
-﻿import { InitializeHubResponse } from '../../shared/api';
+﻿import { CommentListResponse } from '../../shared/api';
 
 export const BrewsSampleComments = {
     'users': {
@@ -152,8 +152,14 @@ export const BrewsSampleComments = {
                 '/r/ModSupport/comments/1vrt975/tools_toys_and_timesavers_digging_into_developer/p4gc5kp/',
         },
     ],
+    'pagination': {
+        'page': 1,
+        'pageSize': 25,
+        'total': 1000
+    },
     'subInfo': {
         'name': 'BeachBrewsBoil',
         'icon': '',
     },
-} satisfies InitializeHubResponse;
+    isMod: true
+} satisfies CommentListResponse;

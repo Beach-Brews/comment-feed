@@ -6,11 +6,8 @@
         "entrypoints": {
             "default": {
                 "inline": true,
-                "entry": "hub.html",
+                "entry": "index.html",
                 "height": "tall"
-            },
-            "expanded": {
-                "entry": "expanded.html"
             }
         }
     },

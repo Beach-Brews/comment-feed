@@ -71,20 +71,22 @@ export type CommentDto = {
 export type UserNameToUserInfoMap = Record<string, UserInfoDto>;
 export type PostIdToPostInfoMap = Record<string, PostInfoDto>;
 
+export type Pagination = {
+    page: number;
+    pageSize: number;
+    total: number;
+};
+
 export type CommentGroupDto = {
     users: UserNameToUserInfoMap;
     posts: PostIdToPostInfoMap;
     comments: CommentDto[];
 };
 
-export type InitializeHubResponse = CommentGroupDto & {
+export type CommentListResponse = CommentGroupDto & {
+    pagination: Pagination;
     subInfo: SubredditInfoDto;
-};
-
-export type Pagination = {
-    page: number;
-    pageSize: number;
-    total: number;
+    isMod?: true | undefined
 };
 
 export type ModCmdRequest = {

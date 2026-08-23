@@ -6,18 +6,33 @@
  */
 
 import { defineMock } from 'vite-plugin-mock-dev-server';
-import { ApiResponse, InitializeHubResponse } from '../../shared/api';
+import { ApiResponse, CommentListResponse } from '../../shared/api';
 import { BrewsSampleComments } from './brewsComments';
+import { SampleSubInfo } from './mockData';
+
+// noinspection JSUnusedLocalSymbols
+// @ts-expect-error Only for some test cases
+const EmptySample: CommentListResponse = {
+    users: {},
+    posts: {},
+    comments: [],
+    pagination: {
+        page: 1,
+        pageSize: 25,
+        total: 0
+    },
+    subInfo: SampleSubInfo
+};
 
 // noinspection JSUnusedGlobalSymbols
 export default defineMock([
     {
-        url: '/api/hub/init',
+        url: '/api/comments',
         method: 'GET',
         body: {
             code: 200,
             message: 'OK',
-            result: BrewsSampleComments
-        } satisfies ApiResponse<InitializeHubResponse>
-    }
+            result: /*EmptySample, */ BrewsSampleComments
+        } satisfies ApiResponse<CommentListResponse>,
+    },
 ]);

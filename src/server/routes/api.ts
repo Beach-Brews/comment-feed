@@ -6,10 +6,11 @@
  */
 
 import { Hono } from 'hono';
-import { context, reddit, scheduler } from '@devvit/web/server';
+import { context, reddit, scheduler, cache } from '@devvit/web/server';
+import { JsonValue } from '@devvit/web/shared';
 import {
     ApiResponse,
-    InitializeHubResponse,
+    CommentListResponse,
     MessageResponse,
     ModCmdRequest,
 } from '../../shared/api';
@@ -20,8 +21,8 @@ import { isMod } from '../utils/userUtils';
 
 export const api = new Hono();
 
-api.post('/hub/mod-cmd', async (c) => {
-    const logger = await Logger.Create('API - Hub Mod Command');
+api.post('/mod-cmd', async (c) => {
+    const logger = await Logger.Create('API - Mod Command');
     try {
         // Throw error if not a mod
         if (!(await isMod()))
@@ -57,7 +58,7 @@ api.post('/hub/mod-cmd', async (c) => {
         );
 
     } catch (error) {
-        logger.error(`Hub Mod Command Error:`, error);
+        logger.error(`Mod Command Error:`, error);
         return c.json<MessageResponse>(
             {
                 code: 500,
@@ -69,40 +70,74 @@ api.post('/hub/mod-cmd', async (c) => {
     }
 });
 
-api.get('/hub/init', async (c) => {
-    const logger = await Logger.Create('API - Hub Init');
+type PaginationParams = {
+    p?: number | undefined;
+    s?: number | undefined;
+    f?: boolean | undefined;
+};
+
+api.get('/comments', async (c) => {
+    const logger = await Logger.Create('API - Comment List');
     try {
-        // TODO: Page parameters in query
-        const page = 1;
-        const pageSize = 25
+        // Get pagination parameters
+        const {
+            s: page = 1,
+            s: pageSize = 25,
+            f: force = false
+        } = c.req.query() as unknown as PaginationParams;
 
-        // TODO: Allow mods to force a cache skip
-        // TODO: Add cache
+        // Define cache function
+        const fetchData = async () => {
+            // Fetch page data from Redis
+            const commentPage = await getCommentIdsForPage(page, pageSize);
 
-        // Get comments for page
-        const commentPage = await getCommentIdsForPage(page, pageSize);
+            // Fetch comment and user data
+            const [currentSub, commentData] = await Promise.all([
+                reddit.getCurrentSubreddit(),
+                getCommentInfoByIds(commentPage.comments),
+            ]);
 
-        // Get subreddit and comment info
-        const [currentSub, commentData] = await Promise.all([
-            reddit.getCurrentSubreddit(),
-            getCommentInfoByIds(commentPage.comments),
-        ]);
-
-        return c.json<ApiResponse<InitializeHubResponse>>({
-            code: 200,
-            message: 'OK',
-            result: {
+            // Return result
+            return {
                 users: commentData.users,
                 posts: commentData.posts,
                 comments: commentData.comments,
+                pagination: {
+                    page: page,
+                    pageSize: pageSize,
+                    total: commentPage.total,
+                },
                 subInfo: {
                     name: currentSub.name,
                     icon: currentSub.settings.communityIcon,
                 },
-            },
+            } satisfies CommentListResponse as JsonValue;
+        };
+
+        // Get value from cache, unless mod requested a forced update
+        const userIsMod = await isMod();
+        const cacheResult = force && userIsMod
+            ? await fetchData()
+            : await cache(fetchData, {
+                key: `api:comment:${page}:${pageSize}`,
+                ttl: 60
+            });
+
+        // Cast result
+        const result = cacheResult as CommentListResponse | undefined;
+
+        // Add mod only if a mod
+        if (result && userIsMod)
+            result.isMod = true;
+
+        return c.json<ApiResponse<CommentListResponse>>({
+            code: 200,
+            message: 'OK',
+            result: result ?? undefined,
         });
+
     } catch (error) {
-        logger.error(`Hub Init Error:`, error);
+        logger.error(`Comment List API Error:`, error);
         return c.json<MessageResponse>({
                 code: 500,
                 message: error instanceof Error

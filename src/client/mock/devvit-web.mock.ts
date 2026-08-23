@@ -8,10 +8,17 @@ export const navigateTo = (url: string) => {
 };
 
 export const getWebViewMode = () => {
-    throw new Error('not implemented');
+    return window.location.hash.substring(1);
 };
 
 export const requestExpandedMode = () => {
+    window.location.hash = 'expanded';
+    window.location.reload();
+};
+
+export const exitExpandedMode = () => {
+    window.location.hash = 'inline';
+    window.location.reload();
 };
 
 export const addWebViewModeListener = () => {
