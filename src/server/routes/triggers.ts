@@ -52,7 +52,7 @@ const handleTrigger = async <TReq>(c: Context, name: string, handler: TriggerHan
 };
 
 triggers.post('/on-app-install', async (c) => {
-    await handleTrigger<OnAppInstallRequest>(c, 'App Install', async (logger, input) => {
+    return await handleTrigger<OnAppInstallRequest>(c, 'App Install', async (logger, input) => {
         logger.info(`Beginning install of ${context.appSlug}v${context.appVersion} by u/${input.installer?.name ?? 'unknown'}`);
 
         await scheduler.runJob({
@@ -66,14 +66,14 @@ triggers.post('/on-app-install', async (c) => {
 });
 
 triggers.post('/on-app-upgrade', async (c) => {
-    await handleTrigger<OnAppUpgradeRequest>(c, 'App Upgrade', async (logger, input) => {
+    return await handleTrigger<OnAppUpgradeRequest>(c, 'App Upgrade', async (logger, input) => {
         logger.info(`Beginning upgrade to ${context.appSlug}v${context.appVersion} by u/${input.installer?.name ?? 'unknown'}`);
         return 'Upgrade successful';
     });
 });
 
 triggers.post('/on-comment-create', async (c) => {
-    await handleTrigger<OnCommentCreateRequest>(c, 'Comment Create', async (logger, input) => {
+    return await handleTrigger<OnCommentCreateRequest>(c, 'Comment Create', async (logger, input) => {
         logger.debug('Process comment create: ', input);
         const ignoredUsers = await AppSettings.GetUserIgnoreList();
         if (input?.comment && !ignoredUsers.has(input.comment.author.toLowerCase()) && input?.post && !input.post.spam) {
@@ -84,7 +84,7 @@ triggers.post('/on-comment-create', async (c) => {
 });
 
 triggers.post('/on-comment-delete', async (c) => {
-    await handleTrigger<OnCommentDeleteRequest>(c, 'Comment Delete', async (logger, input) => {
+    return await handleTrigger<OnCommentDeleteRequest>(c, 'Comment Delete', async (logger, input) => {
         logger.debug('Process comment delete: ', input);
         if (input?.commentId)
             await removeCommentId(input.commentId as T1);
@@ -93,7 +93,7 @@ triggers.post('/on-comment-delete', async (c) => {
 });
 
 triggers.post('/on-automoderator-filter-comment', async (c) => {
-    await handleTrigger<OnAutomoderatorFilterCommentRequest>(c, 'Comment Automod Filter', async (logger, input) => {
+    return await handleTrigger<OnAutomoderatorFilterCommentRequest>(c, 'Comment Automod Filter', async (logger, input) => {
         logger.debug('Process comment automod filtered: ', input);
         if (input?.comment)
             await removeCommentId(input.comment.id as T1);
@@ -102,7 +102,7 @@ triggers.post('/on-automoderator-filter-comment', async (c) => {
 });
 
 triggers.post('/on-mod-action', async (c) => {
-    await handleTrigger<OnModActionRequest>(c, 'Mod Action', async (logger, input) => {
+    return await handleTrigger<OnModActionRequest>(c, 'Mod Action', async (logger, input) => {
         logger.debug('Process mod action: ', input);
         const comment = input?.targetComment;
         if (comment) {

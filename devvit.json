@@ -56,7 +56,7 @@
             "userIgnoreList": {
                 "type": "string",
                 "label": "User Ignore List",
-                "helpText": "A comma separated list of usernames to ignore / filter from the comment feed. Automod comments are automatically filtered. NOTE: Comments for ignored users already tracked by the app will not be removed. As more comments are added by users, the ignored users will eventually "roll off" the tracked list.",
+                "helpText": "A comma separated list of usernames to ignore / filter from the comment feed. Automod comments are automatically filtered. NOTE: Comments for ignored users already tracked by the app will not be removed. As more comments are added by users, the ignored users will eventually \"roll off\" the tracked list.",
                 "defaultValue": ""
             },
             "logLevel": {
