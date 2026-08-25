@@ -15,7 +15,7 @@ export type MessageResponse = ApiResponse<void>;
 
 export type SubredditInfoDto = {
     name: string;
-    icon: string | undefined;
+    icon: string | null;
 };
 
 /*
@@ -63,6 +63,8 @@ export type CommentDto = {
     score: number;
     edited: boolean;
     locked: boolean;
+    removed: boolean;
+    spam: boolean;
     permalink: string;
     //distinguishedBy: string | undefined;
     //modInfo?: PostModInfoDto | undefined;
@@ -85,8 +87,11 @@ export type CommentGroupDto = {
 
 export type CommentListResponse = CommentGroupDto & {
     pagination: Pagination;
+};
+
+export type InitCommentFeedResponse = {
     subInfo: SubredditInfoDto;
-    isMod?: true | undefined
+    isMod?: true | undefined;
 };
 
 export type ModCmdRequest = {

@@ -1,6 +1,6 @@
 {
     "$schema": "https://developers.reddit.com/schema/config-file.v1.json",
-    "name": "commentlist",
+    "name": "comment-feed",
     "post": {
         "dir": "dist/client",
         "entrypoints": {
@@ -15,11 +15,14 @@
         "dir": "dist/server",
         "entry": "index.cjs"
     },
+    "marketingAssets": {
+        "icon": "public/subreddit-comment-feed.png"
+    },
     "menu": {
         "items": [
             {
-                "label": "Create Comment List",
-                "description": "Comment List",
+                "label": "Create Comment Feed",
+                "description": "Comment Feed",
                 "location": "subreddit",
                 "forUserType": "moderator",
                 "endpoint": "/internal/menu/post-create"
@@ -46,9 +49,15 @@
             "commentCount": {
                 "type": "number",
                 "label": "Comment Count",
-                "helpText": "The max number of comments the app tracks at once",
+                "helpText": "The max number of comments the app tracks at once. Min: 5, Max: 5000, Default: 1000",
                 "defaultValue": 1000,
                 "validationEndpoint": "/internal/settings/validate-comment-count"
+            },
+            "userIgnoreList": {
+                "type": "string",
+                "label": "User Ignore List",
+                "helpText": "A comma separated list of usernames to ignore / filter from the comment feed. Automod comments are automatically filtered. NOTE: Comments for ignored users already tracked by the app will not be removed. As more comments are added by users, the ignored users will eventually "roll off" the tracked list.",
+                "defaultValue": ""
             },
             "logLevel": {
                 "type": "select",

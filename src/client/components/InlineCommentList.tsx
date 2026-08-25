@@ -1,180 +1,87 @@
 ﻿/*!
-* Renders a list of comments.
-*
-* Author:  u/Beach-Brews
-* License: BSD-3-Clause
-*/
+ * Renders two comments with a pagination control for the inline view.
+ *
+ * Author:  u/Beach-Brews
+ * License: BSD-3-Clause
+ */
 
-import '../index.css';
-
-import {
-    useState,
-    useCallback,
-    useEffect,
-    Fragment,
-} from 'react';
-import { LoadingSpinner } from './LoadingSpinner';
-import { getWebViewMode } from '@devvit/web/client';
-import {
-    ApiResponse,
-    CommentDto,
-    CommentListResponse,
-    Pagination
-} from '../../shared/api';
+import { Fragment, useEffect, useState } from 'react';
 import { CommentCard } from './CommentCard';
 import { ListPagination } from './ListPagination';
-import { ListHeader } from './ListHeader';
+import { CommentDto, Pagination } from '../../shared/api';
+import { CommentDataHook } from '../hooks/useCommentData';
+import { LoadingSpinner } from './LoadingSpinner';
 
-type HubPagination = Pagination & {
-    comments: CommentDto[];
-};
+export const InlineCommentList = ({
+    commentDataHook,
+}: {
+    commentDataHook: CommentDataHook;
+}) => {
+    const { pageSize } = commentDataHook;
+    const [pagination, setPagination] = useState<Pagination>(() => ({
+        page: Math.floor(commentDataHook.getCurrentIndex() / 2) + 1,
+        pageSize: 2,
+        total: commentDataHook.total,
+    }));
+    const [comments, setComments] = useState<CommentDto[] | undefined>();
 
-export const CommentList = () => {
-    // Initialize the pagination object
-    const [pagination, setPagination] = useState<HubPagination>(() => {
-        return {
-            page: 1,
-            pageSize: 2,
-            total: 0,
-            comments: [],
-        };
-    });
-    const updatePage = (page: number) => {
-        setPagination(p => ({...p, page: page}));
+    const loadComments = async () => {
+        const i = commentDataHook.getCurrentIndex();
+        const next = await commentDataHook.getComments(i, i + 2);
+        setComments(next);
+        if (pageSize - i%pageSize < 6)
+            void commentDataHook.fetchPage(Math.floor(i/pageSize)+2);
     };
-
-    // Helper method for setting the pagination state
-    const updatePagination = useCallback(
-        (allComments: CommentDto[], total: number, page?: number) => {
-            setPagination((p) => {
-                page = page ?? p.page;
-                return {
-                    page: page,
-                    pageSize: 2,
-                    total: total,
-                    comments: allComments.slice((page - 1) * 2, page * 2),
-                };
-            });
-        },
-        []
-    );
-
-    // Initialize the hub data (comments, sub, etc.)
-    const [hubInit, setHubInit] = useState<
-        CommentListResponse | null | undefined
-    >(undefined);
+    const updatePage = (p: number) => {
+        setPagination((s) => ({ ...s, page: p }));
+        setComments(undefined);
+        commentDataHook.setCurrentIndex((p - 1) * 2);
+        void loadComments();
+    };
     useEffect(() => {
-        const initHub = async () => {
-            try {
-                const resp = await fetch('/api/comments');
-                const data = resp.ok
-                    ? ((
-                          (await resp.json()) as ApiResponse<CommentListResponse>
-                      )?.result ?? null)
-                    : null;
-                setHubInit(data);
-                if (data?.comments && data.comments.length > 0) {
-                    updatePagination(data.comments, data.pagination.total, 1);
-                }
-            } catch (e) {
-                console.log('[CommentList] Comment API error: ', e);
-                setHubInit(null);
-            }
-        };
-        void initHub();
-    }, [updatePagination]);
-
-    const isExpanded = getWebViewMode() === 'expanded';
-
-    // Handle loading or error
-    if (!hubInit) {
-        return (
-            <div className="flex flex-col gap-4 justify-center items-center h-full">
-                {hubInit === undefined ? (
-                    <>
-                        <LoadingSpinner className="size-12" />
-                        <div className="text-xl text-center">
-                            Loading Comments...
-                        </div>
-                    </>
-                ) : (
-                    <>
-                        <img
-                            className="w-1/2"
-                            src="snoo-facepalm.png"
-                            alt="Snoo Facepalm"
-                        />
-                        <div className="text-xl text-center">
-                            Sorry, there was an error loading the comment list.
-                            Please try again later.
-                        </div>
-                    </>
-                )}
-            </div>
-        );
-    }
-
+        updatePage(1);
+    }, []);
     return (
-        <div className="w-full h-full overflow-hidden">
-            <div className="flex flex-col h-full">
-                <ListHeader pagination={pagination} subInfo={hubInit.subInfo} />
-                {/* No comments */}
-                {hubInit.comments.length <= 0 ? (
-                    <div className="flex flex-col gap-2 p-2 justify-center items-center border-t border-t-neutral-border">
-                        <div className="text-lg text-center text-neutral-content-weak">
-                            No comments in feed. Check back soon!
-                        </div>
-                        <img
-                            className="w-1/2"
-                            src="snoo-thumbs-up.png"
-                            alt="Snoo Thumbs Up"
-                        />
-                    </div>
-                ) : (
-                    <>
-                        <div className={!isExpanded ? 'flex-1 relative grow h-[0%]' : ''}>
-                            <div
-                                className={`flex flex-col gap-1 p-2 ${isExpanded ? 'overflow-y-auto' : 'overflow-hidden justify-between h-full'}`}
-                            >
-                                {pagination.comments.length > 0 ? (
-                                    pagination.comments.map((s, i) => (
-                                        <Fragment key={'card' + s.id}>
-                                            <CommentCard
-                                                key={s.id}
-                                                comment={s}
-                                                post={hubInit.posts[s.postId]}
-                                                author={
-                                                    hubInit.users[s.authorName]
-                                                }
-                                            />
-                                            {i <
-                                                pagination.comments.length -
-                                                    1 && (
-                                                <div
-                                                    id={'sep' + s.id}
-                                                    className="h-px shrink-0 w-full bg-neutral-border-weak"
-                                                ></div>
-                                            )}
-                                        </Fragment>
-                                    ))
-                                ) : (
-                                    <div className="text-content-neutral flex flex-col gap-2 items-center">
-                                        <div>End of comment feed.</div>
-                                        <img
-                                            className="w-1/2"
-                                            src="snoo-thumbs-up.png"
-                                            alt="Snoo Thumbs Up"
-                                        />
-                                    </div>
-                                )}
+        <>
+            <div className="flex-1 relative grow h-[0%]">
+                <div className="flex flex-col gap-1 p-2 overflow-hidden justify-between h-full">
+                    {comments === undefined ? (
+                        <div className="w-full flex flex-col gap2 items-center">
+                            <LoadingSpinner className="size-12" />
+                            <div className="text-xl text-center">
+                                Loading Comments...
                             </div>
                         </div>
-                        {!isExpanded && (
-                            <ListPagination pagination={pagination} updatePage={updatePage} />
-                        )}
-                    </>
-                )}
+                    ) : comments.length > 0 ? (
+                        comments.map((s, i) => (
+                            <Fragment key={'card' + s.id}>
+                                <CommentCard
+                                    key={s.id}
+                                    comment={s}
+                                    post={commentDataHook.posts[s.postId]}
+                                    author={commentDataHook.users[s.authorName]}
+                                />
+                                {i < comments.length - 1 && (
+                                    <div
+                                        id={'sep' + s.id}
+                                        className="h-px shrink-0 w-full bg-neutral-border-weak"
+                                    ></div>
+                                )}
+                            </Fragment>
+                        ))
+                    ) : (
+                        <div className="text-content-neutral flex flex-col gap-2 items-center">
+                            <div>End of comment feed.</div>
+                            <img
+                                className="w-1/2"
+                                src="snoo-thumbs-up.png"
+                                alt="Snoo Thumbs Up"
+                            />
+                        </div>
+                    )}
+                </div>
             </div>
-        </div>
+            <ListPagination pagination={pagination} updatePage={updatePage} loading={comments === undefined} />
+        </>
     );
 };

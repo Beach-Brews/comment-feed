@@ -32,14 +32,19 @@ jobs.post('/preload', async (c) => {
             pageSize: 10
         });
 
+        const ignoredUsers = await AppSettings.GetUserIgnoreList();
         const targetCount = await AppSettings.GetCommentCount();
         const addCommentRecursive = async (comment: Comment) => {
             const runTime = Date.now() - start;
             if (runTime > 15000)
                throw new TimeLimitError(`Max execution time of 15 seconds reached: ${runTime}ms`);
 
-            if (!comment.isRemoved() && !comment.isSpam()) {
-                await addComment(comment);
+            if (
+                !comment.isRemoved() &&
+                !comment.isSpam() &&
+                !ignoredUsers.has(comment.authorName.toLowerCase())
+            ) {
+                await addComment(comment, comment.createdAt.getTime());
                 ++count;
             }
 
@@ -51,6 +56,7 @@ jobs.post('/preload', async (c) => {
         try {
             while (hotPosts.hasMore && count < targetCount) {
                 for await (const post of hotPosts) {
+                    if (post.removed || post.spam) continue;
                     for await (const comment of post.comments) {
                         await addCommentRecursive(comment);
                     }

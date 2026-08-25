@@ -1,6 +1,6 @@
 {
     "private": true,
-    "name": "commentlist",
+    "name": "comment-feed",
     "version": "0.0.0",
     "license": "BSD-3-Clause",
     "type": "module",
@@ -14,7 +14,8 @@
         "prettier": "prettier --write .",
         "test:types": "tsc --build",
         "test:unit": "node --experimental-strip-types --no-warnings=ExperimentalWarning --test \"src/**/*.test.ts\"",
-        "local": "cd src/client && vite --port 7474"
+        "local": "cd src/client && vite --port 7474",
+        "uat": "devvit playtest UAT4CommentFeed"
     },
     "engines": {
         "node": ">=24.0.0"

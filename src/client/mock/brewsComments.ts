@@ -31,6 +31,8 @@ export const BrewsSampleComments = {
             'score': 2,
             'edited': false,
             'locked': false,
+            'removed': false,
+            'spam': false,
             'permalink':
                 '/r/Devvit/comments/1vsqkz6/what_am_i_doing_wrong/p4n8u2a/',
         },
@@ -44,6 +46,8 @@ export const BrewsSampleComments = {
             'score': 2,
             'edited': false,
             'locked': false,
+            'removed': false,
+            'spam': false,
             'permalink':
                 '/r/ModSupport/comments/1vrt975/tools_toys_and_timesavers_digging_into_developer/p4ikes5/',
         },
@@ -57,6 +61,8 @@ export const BrewsSampleComments = {
             'score': 2,
             'edited': false,
             'locked': false,
+            'removed': true,
+            'spam': false,
             'permalink':
                 '/r/ModSupport/comments/1vrt975/tools_toys_and_timesavers_digging_into_developer/p4i9w7b/',
         },
@@ -70,6 +76,8 @@ export const BrewsSampleComments = {
             'score': 5,
             'edited': false,
             'locked': false,
+            'removed': false,
+            'spam': true,
             'permalink':
                 '/r/ModSupport/comments/1vrt975/tools_toys_and_timesavers_digging_into_developer/p4ha88a/',
         },
@@ -83,6 +91,8 @@ export const BrewsSampleComments = {
             'score': 4,
             'edited': false,
             'locked': false,
+            'removed': false,
+            'spam': false,
             'permalink':
                 '/r/Devvit/comments/1vrxs2a/domain_exception_pending_for_4_days/p4gwglx/',
         },
@@ -96,6 +106,8 @@ export const BrewsSampleComments = {
             'score': 2,
             'edited': false,
             'locked': false,
+            'removed': false,
+            'spam': false,
             'permalink':
                 '/r/ModSupport/comments/1vrt975/tools_toys_and_timesavers_digging_into_developer/p4gj7yv/',
         },
@@ -109,6 +121,8 @@ export const BrewsSampleComments = {
             'score': 2,
             'edited': false,
             'locked': false,
+            'removed': false,
+            'spam': false,
             'permalink':
                 '/r/ModSupport/comments/1vrt975/tools_toys_and_timesavers_digging_into_developer/p4gh58a/',
         },
@@ -122,6 +136,8 @@ export const BrewsSampleComments = {
             'score': 2,
             'edited': false,
             'locked': false,
+            'removed': false,
+            'spam': false,
             'permalink':
                 '/r/ModSupport/comments/1vrt975/tools_toys_and_timesavers_digging_into_developer/p4ggcmv/',
         },
@@ -135,6 +151,8 @@ export const BrewsSampleComments = {
             'score': 2,
             'edited': false,
             'locked': false,
+            'removed': false,
+            'spam': false,
             'permalink':
                 '/r/ModSupport/comments/1vrt975/tools_toys_and_timesavers_digging_into_developer/p4gf7eu/',
         },
@@ -148,6 +166,8 @@ export const BrewsSampleComments = {
             'score': 3,
             'edited': false,
             'locked': false,
+            'removed': false,
+            'spam': false,
             'permalink':
                 '/r/ModSupport/comments/1vrt975/tools_toys_and_timesavers_digging_into_developer/p4gc5kp/',
         },
@@ -155,11 +175,6 @@ export const BrewsSampleComments = {
     'pagination': {
         'page': 1,
         'pageSize': 25,
-        'total': 1000
+        'total': 10,
     },
-    'subInfo': {
-        'name': 'BeachBrewsBoil',
-        'icon': '',
-    },
-    isMod: true
 } satisfies CommentListResponse;

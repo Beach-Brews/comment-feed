@@ -1,5 +1,5 @@
 ﻿/*!
- * Renders two.
+ * Renders the expanded comment list.
  *
  * Author:  u/Beach-Brews
  * License: BSD-3-Clause
@@ -12,30 +12,28 @@ import { CommentDto, Pagination } from '../../shared/api';
 import { CommentDataHook } from '../hooks/useCommentData';
 import { LoadingSpinner } from './LoadingSpinner';
 
-export const InlineCommentList = ({
+export const ExpandedCommentList = ({
     commentDataHook,
 }: {
     commentDataHook: CommentDataHook;
 }) => {
     const { pageSize } = commentDataHook;
     const [pagination, setPagination] = useState<Pagination>(() => ({
-        page: Math.floor(commentDataHook.getCurrentIndex() / 2) + 1,
-        pageSize: 2,
+        page: Math.floor(commentDataHook.getCurrentIndex() / pageSize) + 1,
+        pageSize: pageSize,
         total: commentDataHook.total,
     }));
     const [comments, setComments] = useState<CommentDto[] | undefined>();
 
     const loadComments = async () => {
         const i = commentDataHook.getCurrentIndex();
-        const next = await commentDataHook.getComments(i, i + 2);
+        const next = await commentDataHook.getComments(i, i + pageSize);
         setComments(next);
-        if (pageSize - i%pageSize < 6)
-            void commentDataHook.fetchPage(Math.floor(i/pageSize)+2);
     };
     const updatePage = (p: number) => {
         setPagination((s) => ({ ...s, page: p }));
         setComments(undefined);
-        commentDataHook.setCurrentIndex((p - 1) * 2);
+        commentDataHook.setCurrentIndex((p - 1) * pageSize);
         void loadComments();
     };
     useEffect(() => {
@@ -44,7 +42,7 @@ export const InlineCommentList = ({
     return (
         <>
             <div className="flex-1 relative grow h-[0%]">
-                <div className="flex flex-col gap-1 p-2 overflow-hidden justify-between h-full">
+                <div className="flex flex-col gap-1 p-2 overflow-y-auto">
                     {comments === undefined ? (
                         <div className="w-full flex flex-col gap2 items-center">
                             <LoadingSpinner className="size-12" />

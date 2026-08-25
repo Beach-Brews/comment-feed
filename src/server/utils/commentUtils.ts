@@ -135,6 +135,8 @@ export const getCommentInfoByIds = async (commentIds: T1[]): Promise<CommentGrou
                 score: c.score,
                 edited: c.edited,
                 locked: c.locked,
+                removed: c.removed,
+                spam: c.spam,
                 permalink: c.permalink,
             }) satisfies CommentDto
     );

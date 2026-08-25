@@ -19,6 +19,7 @@ import { context, scheduler, ModActionType } from '@devvit/web/server';
 import { Logger } from '../utils/Logger';
 import { addComment, removeCommentId } from '../utils/redisUtils';
 import { T1 } from '../../shared/types';
+import { AppSettings } from '../utils/AppSettings';
 
 export const triggers = new Hono();
 
@@ -74,8 +75,10 @@ triggers.post('/on-app-upgrade', async (c) => {
 triggers.post('/on-comment-create', async (c) => {
     await handleTrigger<OnCommentCreateRequest>(c, 'Comment Create', async (logger, input) => {
         logger.debug('Process comment create: ', input);
-        if (input?.comment)
+        const ignoredUsers = await AppSettings.GetUserIgnoreList();
+        if (input?.comment && !ignoredUsers.has(input.comment.author.toLowerCase()) && input?.post && !input.post.spam) {
             await addComment(input.comment);
+        }
         return 'Comment Create successful';
     });
 });

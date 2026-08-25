@@ -11,7 +11,7 @@ export const isMod = async (user?: User): Promise<boolean> => {
     user = user ?? await reddit.getCurrentUser();
     if (!user || !context.subredditName) return false;
     const modPermissions = await user.getModPermissionsForSubreddit(context.subredditName);
-    return modPermissions.some(p => p === 'all' || p === 'posts' || p === 'config');
+    return modPermissions.length > 0;
 };
 
 export const isBanned = async (username?: string, subredditName?: string): Promise<boolean>  => {

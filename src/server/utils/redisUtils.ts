@@ -14,9 +14,9 @@ const RedisKeys = {
     CommentSet: () => `com:st`
 };
 
-export const addComment = async (comment: Comment | CommentV2): Promise<void> => {
+export const addComment = async (comment: Comment | CommentV2, time?: number): Promise<void> => {
     const key = RedisKeys.CommentSet();
-    await redis.zAdd(key, { member: comment.id, score: Date.now() });
+    await redis.zAdd(key, { member: comment.id, score: time ?? Date.now() });
     await redis.zRemRangeByRank(key, 0, -1 * (await AppSettings.GetCommentCount()));
 };
 
@@ -38,12 +38,11 @@ export const getCommentIdsForPage = async (
     pageSize: number
 ): Promise<CommentPage> => {
     const key = RedisKeys.CommentSet();
+    const start = (page - 1) * pageSize;
+    const end = start + pageSize - 1;
     return {
-        comments: (
-            await redis.zRange(key, (page - 1) * pageSize, page * pageSize, {
-                by: 'rank',
-            })
-        ).map((m) => m.member as T1),
+        comments: (await redis.zRange(key, start, end, { by: 'rank' }))
+            .map((m) => m.member as T1),
         total: await redis.zCard(key),
     };
 };
