@@ -48,7 +48,9 @@ export type LinkOptions =
 
 export const linkForThing = (options: LinkOptions) => {
     if ('path' in options) {
-        return `https://www.reddit.com${options.path}`;
+        return options.path.startsWith('https')
+            ? options.path
+            : `https://www.reddit.com${options.path}`;
     } else if ('username' in options) {
         return `https://www.reddit.com/u/${options.username}`;
     } else if ('commentId' in options) {
@@ -59,8 +61,12 @@ export const linkForThing = (options: LinkOptions) => {
     return '#';
 };
 
+const isMeta = (e: MouseEvent) =>
+    e.button !== 0 || e.ctrlKey || e.altKey || e.metaKey || e.shiftKey;
+
 export const openLink = (event: MouseEvent, options: LinkOptions) => {
-    if (event.button !== 0 || event.ctrlKey || event.altKey || event.metaKey || event.shiftKey)
+    event.stopPropagation();
+    if (event.currentTarget.tagName === 'A' && isMeta(event))
         return false;
     event.preventDefault();
     navigateTo(linkForThing(options));

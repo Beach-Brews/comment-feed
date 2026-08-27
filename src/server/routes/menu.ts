@@ -19,7 +19,7 @@ menu.post('/post-create', async (c) => {
         const post = await reddit.submitCustomPost({
             title: `r/${context.subredditName} Comment Feed`,
             textFallback: {
-                text: `r/${context.subredditName} Comment Feed`,
+                text: `r/${context.subredditName} Comment Feed - Only available on SH Reddit`,
             },
             styles: {
                 backgroundColor: '#ffffffff',

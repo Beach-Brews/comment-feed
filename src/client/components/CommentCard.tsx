@@ -29,14 +29,11 @@ export const CommentCard = ({
     return (
         <div
             onClick={(e) =>
-                openLink(e, {
-                    postId: comment.postId,
-                    commentId: comment.id,
-                })
+                openLink(e, { path: comment.permalink })
             }
-            className="w-full flex flex-col gap-2 p-2 text-sm rounded-xl hover:cursor-pointer hover:bg-neutral-background-hovered"
+            className="w-full flex flex-col gap-2 p-2 text-sm break-words rounded-xl hover:cursor-pointer hover:bg-neutral-background-hovered"
         >
-            <div className="flex gap-2 items-center text-neutral-content-weak break-words">
+            <div className="flex gap-2 items-center text-neutral-content-weak">
                 <div className="shrink-0 size-8 object-contain overflow-hidden rounded-full">
                     <img
                         src={
@@ -92,7 +89,9 @@ export const CommentCard = ({
             >
                 {post?.title ?? '[deleted]'}
             </a>
-            <div className={`text-neutral-content-strong ${!isExpanded && 'line-clamp-3'}`}>
+            <div
+                className={`text-neutral-content-strong ${!isExpanded && 'line-clamp-3'}`}
+            >
                 {comment.body}
             </div>
             <div className="flex justify-between items-center">
@@ -104,6 +103,15 @@ export const CommentCard = ({
                         </span>
                         <DownvoteIcon />
                     </div>
+                    <a
+                        href={linkForThing({ path: comment.permalink })}
+                        onClick={(e) =>
+                            openLink(e, { path: comment.permalink })
+                        }
+                        className="text-xs"
+                    >
+                        permalink
+                    </a>
                 </div>
                 <div className="flex justify-end items-center gap-2"></div>
             </div>

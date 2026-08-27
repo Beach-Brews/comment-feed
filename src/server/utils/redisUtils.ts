@@ -28,6 +28,10 @@ export const hasCommentId = async (id: T1): Promise<boolean> => {
     return await redis.zScore(RedisKeys.CommentSet(), id) !== undefined;
 };
 
+export const commentCount = async (): Promise<number> => {
+    return await redis.zCard(RedisKeys.CommentSet());
+};
+
 export type CommentPage = {
     comments: T1[];
     total: number;
@@ -41,7 +45,7 @@ export const getCommentIdsForPage = async (
     const start = (page - 1) * pageSize;
     const end = start + pageSize - 1;
     return {
-        comments: (await redis.zRange(key, start, end, { by: 'rank' }))
+        comments: (await redis.zRange(key, start, end, { by: 'rank', reverse: true }))
             .map((m) => m.member as T1),
         total: await redis.zCard(key),
     };

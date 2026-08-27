@@ -14,6 +14,7 @@ import {
     UserNameToUserInfoMap, UserInfoDto,
 } from '../../shared/api';
 import { toDistinct } from './setUtils';
+import { AppSettings } from './AppSettings';
 
 type CommentIdToAuthorMap = Partial<Record<T1, string>>;
 
@@ -105,12 +106,14 @@ const getUserInfoMap = async (
 
 export const getCommentInfoByIds = async (commentIds: T1[]): Promise<CommentGroupDto> => {
 
-    // Get comments from the passed in IDs
-    const comments = await Promise.all(
-        commentIds.map((i) => reddit.getCommentById(i))
-    );
+    // Get ignore list setting
+    const ignoredUsers = await AppSettings.GetUserIgnoreList();
 
-    // TODO: Force remove [removed] or [deleted] (comment or username)
+    // Get comments from the passed in IDs
+    const comments = (
+        await Promise.all(commentIds.map((i) => reddit.getCommentById(i)))
+    ).filter((c) => !c.removed && !c.spam && !ignoredUsers.has(c.authorName) &&
+        c.body !== '[deleted]' && c.body !== '[removed]');
 
     // Call reddit API on users and posts
     // const [replyAuthors, postMap, userMap] = await Promise.all([

@@ -105,7 +105,7 @@ export class Logger {
                             ? JSON.stringify(o)
                             : `${o}`
         );
-        return `${this.getLogDateFormat()} [${this.#label}] ${LogLevel[level].toUpperCase()} - ${msgFmt.join(' ')}`;
+        return `${this.getLogDateFormat()} [${this.#label}] ${LogLevel[level].toUpperCase()} - ${msgFmt.join('')}`;
     }
 
 }

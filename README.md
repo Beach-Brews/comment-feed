@@ -1,20 +1,29 @@
 # Subreddit Comment Feed
 
-Displays a feed of the latest comments on your subreddit. Selecting a comment links you to the
-comment.
+Displays a feed of the most recent comments on your subreddit. Selecting a comment links you to the
+comment. Expanded view (bottom left button) shows up to 25 comments at a time.
 
 Simple!
 
+Mod Actions (see reports + approve/remove) coming soon.
+
+![Subreddit Comment Feed Inline](https://i.redd.it/m19roj146ylh1.png)
+![Subreddit Comment Feed Expanded](https://i.redd.it/ixybc6exlzlh1.png)
+
 ## Creating the Comment Feed Post
 
-After installing the app, you can create a new Comment Feed post using the "ellipses" menu of the
-main subreddit page.
+After installing the app, you can create a new Comment Feed post using the "three-dot" menu 
+on the main subreddit page, and choosing "Create Comment Feed"
+
+![Create Comment Feed](https://i.redd.it/uti4j3vamzlh1.png)
+
+Please reach out on [r/CommentFeedApp](https://www.reddit.com/r/CommentFeedApp/) if you have any issues or want to request new features!
 
 ## How Does it Work?
 
-On install, the top 1000 "hot" posts are scanned and all comments added, up to the first 1000
-comments. From there, every new comment submitted will be "tracked" by the app. Removed,
-spam, and deleted comments are removed from the list.
+On install, "new" posts are scanned and comments added until the comment list is 
+populated with 1000 comments. From there, every new comment submitted will be 
+"tracked" by the app. Removed, spam, and deleted comments do not display.
 
 ## Settings
 

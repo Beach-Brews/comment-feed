@@ -101,13 +101,13 @@ html {
 
     /* ===== Default Link styles ===== */
     a {
-        @apply cursor-pointer text-neutral-content-strong;
+        @apply cursor-pointer text-neutral-content;
     }
     a:hover {
         @apply text-primary-plain-hovered underline;
     }
     a.link-strong {
-        @apply font-bold;
+        @apply text-neutral-content-strong font-bold;
     }
     a.link-strong:hover {
         @apply no-underline;

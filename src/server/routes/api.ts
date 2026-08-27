@@ -6,6 +6,8 @@
  */
 
 import { Hono } from 'hono';
+import { zValidator } from '@hono/zod-validator'
+import { z } from 'zod'
 import { context, reddit, scheduler, cache } from '@devvit/web/server';
 import { JsonValue } from '@devvit/web/shared';
 import {
@@ -17,7 +19,10 @@ import {
 } from '../../shared/api';
 import { getCommentInfoByIds } from '../utils/commentUtils';
 import { Logger } from '../utils/Logger';
-import { clearAllComments, getCommentIdsForPage } from '../utils/redisUtils';
+import {
+    clearAllComments,
+    getCommentIdsForPage,
+} from '../utils/redisUtils';
 import { isMod } from '../utils/userUtils';
 
 export const api = new Hono();
@@ -123,13 +128,13 @@ api.get('/init', async (c) => {
     }
 });
 
-type PaginationParams = {
-    p?: number | undefined;
-    s?: number | undefined;
-    f?: boolean | undefined;
-};
+const CommentApiParamSchema = z.object({
+    p: z.coerce.number().optional().default(1),
+    s: z.coerce.number().optional().default(25),
+    f: z.coerce.boolean().optional().default(false)
+});
 
-api.get('/comments', async (c) => {
+api.get('/comments', zValidator('query', CommentApiParamSchema), async (c) => {
     const logger = await Logger.Create('API - Comment List');
     try {
         // Determine if user is a mod or not
@@ -139,8 +144,8 @@ api.get('/comments', async (c) => {
         const {
             p: page = 1,
             s: pageSize = 25,
-            f: force = false
-        } = c.req.query() as unknown as PaginationParams;
+            f: force = false,
+        } = c.req.valid('query');
         logger.debug(
             'Begin API. Is Mod: ', userIsMod,
             ' | Page: ', page,
@@ -155,16 +160,24 @@ api.get('/comments', async (c) => {
             logger.debug('Fetching comment data - Time:  ', start);
 
             // Fetch page data from Redis
-            const commentPage = context.userId === undefined
-                ? { comments: [], total: 0  }
-                : await getCommentIdsForPage(page, pageSize);
+            const commentPage =
+                context.userId === undefined
+                    ? { comments: [], total: 0 }
+                    : await getCommentIdsForPage(page, pageSize);
+            logger.debug(
+                'Received ',
+                commentPage.comments.length,
+                ' comments to process'
+            );
 
             // Fetch comment and user data
             const commentData = await getCommentInfoByIds(commentPage.comments);
 
             // Log processing time
             const exTime = Date.now() - start;
-            logger.debug(`Finished processing ${commentData.comments.length} comments in ${exTime}ms.`);
+            logger.debug(
+                `Finished processing ${commentData.comments.length} comments in ${exTime}ms.`
+            );
 
             // Return result
             return {
@@ -175,19 +188,20 @@ api.get('/comments', async (c) => {
                     page: page,
                     pageSize: pageSize,
                     total: commentPage.total,
-                }
+                },
             } satisfies CommentListResponse as JsonValue;
         };
 
         // Get value from cache, unless mod requested a forced update
         // TODO: Semi-big bug: Next page may return some comments from the previous page when new comments are added and
         // ranks shift
-        const cacheResult = force && userIsMod
-            ? await fetchData()
-            : await cache(fetchData, {
-                key: `api:comment:${page}:${pageSize}`,
-                ttl: 60
-            });
+        const cacheResult =
+            force && userIsMod
+                ? await fetchData()
+                : await cache(fetchData, {
+                      key: `api:comment:${page}:${pageSize}`,
+                      ttl: 60,
+                  });
 
         // Cast result
         const result = cacheResult as CommentListResponse | undefined;
@@ -197,15 +211,14 @@ api.get('/comments', async (c) => {
             message: 'OK',
             result: result ?? undefined,
         });
-
     } catch (error) {
         logger.error(`Comment List API Error:`, error);
-        return c.json<MessageResponse>({
+        return c.json<MessageResponse>(
+            {
                 code: 500,
-                message: error instanceof Error
-                    ? error.message
-                    : 'Unknown error',
-                result: undefined
+                message:
+                    error instanceof Error ? error.message : 'Unknown error',
+                result: undefined,
             },
             500
         );
