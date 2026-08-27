@@ -13,13 +13,13 @@ import { Logger } from '../utils/Logger';
 export const menu = new Hono();
 
 menu.post('/post-create', async (c) => {
-    const logger = await Logger.Create('Menu - Create Hub');
+    const logger = await Logger.Create('Menu - Create Feed Post');
     try {
-        logger.debug('Creating hub post');
+        logger.debug('Creating feed post');
         const post = await reddit.submitCustomPost({
-            title: `r/${context.subredditName} Comment List`,
+            title: `r/${context.subredditName} Comment Feed`,
             textFallback: {
-                text: `r/${context.subredditName} Comment List`,
+                text: `r/${context.subredditName} Comment Feed`,
             },
             styles: {
                 backgroundColor: '#ffffffff',
@@ -28,7 +28,7 @@ menu.post('/post-create', async (c) => {
             },
         });
 
-        logger.info(`Created new hub post: ${post.id}`);
+        logger.info(`Created new feed post: ${post.id}`);
         return c.json<UiResponse>(
             {
                 navigateTo: `https://reddit.com/r/${context.subredditName}/comments/${post.id}`,

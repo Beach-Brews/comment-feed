@@ -110,6 +110,8 @@ export const getCommentInfoByIds = async (commentIds: T1[]): Promise<CommentGrou
         commentIds.map((i) => reddit.getCommentById(i))
     );
 
+    // TODO: Force remove [removed] or [deleted] (comment or username)
+
     // Call reddit API on users and posts
     // const [replyAuthors, postMap, userMap] = await Promise.all([
     //     getReplyAuthorMap(comments),

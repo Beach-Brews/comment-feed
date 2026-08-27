@@ -96,4 +96,5 @@ export type InitCommentFeedResponse = {
 
 export type ModCmdRequest = {
     cmd: 'clear' | 'preload';
+    sub?: string;
 };

@@ -51,6 +51,8 @@ export class AppSettings {
                 .filter(v => v.length > 0)
             : [];
         list.push('automoderator');
+        list.push('[deleted]');
+        list.push('[removed]');
         return new Set(list);
     }
 

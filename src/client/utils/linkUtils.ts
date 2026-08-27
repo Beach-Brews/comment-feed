@@ -8,10 +8,9 @@
 import { MouseEvent } from 'react';
 import { navigateTo } from '@devvit/web/client';
 import { T1, T3 } from '../../shared/types';
+import { context } from '@devvit/web/client';
 
-export type BaseLinkOptions = {
-    event: MouseEvent;
-};
+export type BaseLinkOptions = {};
 
 export type PathLinkOptions = BaseLinkOptions & {
     path: string;
@@ -47,19 +46,23 @@ export type LinkOptions =
     PostLinkOptions |
     CommentLinkOptions;
 
-export const openLink = (options: LinkOptions) => {
-    const { event } = options;
-    event.stopPropagation();
-    event.preventDefault();
-
+export const linkForThing = (options: LinkOptions) => {
     if ('path' in options) {
-        navigateTo(`https://www.reddit.com${options.path}`);
+        return `https://www.reddit.com${options.path}`;
     } else if ('username' in options) {
-        navigateTo(`https://www.reddit.com/u/${options.username}`);
+        return `https://www.reddit.com/u/${options.username}`;
     } else if ('commentId' in options) {
-        navigateTo(`https://www.reddit.com/comments/${options.postId}/comment/${options.commentId}`);
+        return `https://www.reddit.com/r/${context.subredditName}/comments/${options.postId.substring(3)}/comment/${options.commentId.substring(3)}`;
     } else if ('postId' in options) {
-        navigateTo(`https://www.reddit.com/comments/${options.postId}`);
+        return `https://www.reddit.com/r/${context.subredditName}/comments/${options.postId.substring(3)}`;
     }
+    return '#';
+};
 
+export const openLink = (event: MouseEvent, options: LinkOptions) => {
+    if (event.button !== 0 || event.ctrlKey || event.altKey || event.metaKey || event.shiftKey)
+        return false;
+    event.preventDefault();
+    navigateTo(linkForThing(options));
+    return true;
 };

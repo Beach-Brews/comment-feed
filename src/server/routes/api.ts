@@ -30,15 +30,16 @@ api.post('/mod-cmd', async (c) => {
             throw new Error(`User ${context.username} is not a mod.`);
 
         // Get command
-        const cmd = await c.req.json<ModCmdRequest>();
+        const { cmd, sub } = await c.req.json<ModCmdRequest>();
         logger.debug('Received mod command: ', cmd);
 
-        switch (cmd.cmd) {
+        switch (cmd) {
             case 'preload':
                 // Schedule job
                 await scheduler.runJob({
                     name: 'preload',
                     runAt: new Date(Date.now() + 1000 + Math.random() * 3000),
+                    data: { subredditName: sub && sub.length > 0 ? sub : null },
                 });
                 logger.info('Scheduled preload job');
                 break;
@@ -76,10 +77,12 @@ api.get('/init', async (c) => {
     try {
         // Determine if user is a mod or not
         const userIsMod = await isMod();
+        logger.debug('User is mod: ', userIsMod);
 
         // Get subreddit info (from cache)
         const result = (await cache(
             async () => {
+                logger.debug('Cache miss. Getting subreddit info.');
                 const sub = await reddit.getCurrentSubreddit();
                 return {
                     subInfo: {
@@ -93,6 +96,7 @@ api.get('/init', async (c) => {
                 ttl: 60,
             }
         )) as InitCommentFeedResponse;
+        logger.debug('Subreddit info: ', result);
 
         // Only add isMod if actually a mod (security)
         if (userIsMod)

@@ -7,7 +7,7 @@ Simple!
 
 ## Creating the Comment Feed Post
 
-After installing the app, you can create a new Comment Reed post using the "ellipses" menu of the
+After installing the app, you can create a new Comment Feed post using the "ellipses" menu of the
 main subreddit page.
 
 ## How Does it Work?

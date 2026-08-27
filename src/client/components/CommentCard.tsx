@@ -9,16 +9,18 @@ import { CommentDto, PostInfoDto, UserInfoDto } from '../../shared/api';
 import { useState } from 'react';
 import { formatRelativeDateTime } from '../utils/dateFormat';
 import { DownvoteIcon, UpvoteIcon } from './CustomIcons';
-import { openLink } from '../utils/linkUtils';
+import { linkForThing, openLink } from '../utils/linkUtils';
 
 export const CommentCard = ({
     comment,
     post,
     author,
+    isExpanded,
 }: {
     comment: CommentDto;
     post: PostInfoDto | undefined;
     author: UserInfoDto | undefined;
+    isExpanded: boolean;
 }) => {
     const [defaultSnoo] = useState<string>(
         () =>
@@ -27,32 +29,33 @@ export const CommentCard = ({
     return (
         <div
             onClick={(e) =>
-                openLink({
-                    event: e,
+                openLink(e, {
                     postId: comment.postId,
                     commentId: comment.id,
                 })
             }
-            className="w-full flex gap-2 p-4 text-sm rounded-xl hover:cursor-pointer hover:bg-neutral-background-hovered"
+            className="w-full flex flex-col gap-2 p-2 text-sm rounded-xl hover:cursor-pointer hover:bg-neutral-background-hovered"
         >
-            <div className="shrink-0 size-8 object-contain overflow-hidden rounded-full">
-                <img
-                    src={
-                        author?.snoovatar !== undefined &&
-                        author.snoovatar.length > 0
-                            ? author.snoovatar
-                            : defaultSnoo
-                    }
-                    alt={comment.authorName}
-                />
-            </div>
-            <div className="flex-1 min-w-0 flex flex-col gap-2">
-                <div className="text-neutral-content-weak">
+            <div className="flex gap-2 items-center text-neutral-content-weak break-words">
+                <div className="shrink-0 size-8 object-contain overflow-hidden rounded-full">
+                    <img
+                        src={
+                            author?.snoovatar !== undefined &&
+                            author.snoovatar.length > 0
+                                ? author.snoovatar
+                                : defaultSnoo
+                        }
+                        alt={comment.authorName}
+                    />
+                </div>
+                <div className={!isExpanded ? 'line-clamp-2' : ''}>
                     <a
-                        href="#"
+                        href={linkForThing({
+                            username: comment.authorName,
+                        })}
                         className="link-strong"
                         onClick={(e) =>
-                            openLink({ event: e, username: comment.authorName })
+                            openLink(e, { username: comment.authorName })
                         }
                     >
                         {comment.authorName}
@@ -62,11 +65,12 @@ export const CommentCard = ({
                         <>
                             replied to&nbsp;
                             <a
-                                href="#"
+                                href={linkForThing({
+                                    username: comment.replyAuthorName!,
+                                })}
                                 className="link-strong"
                                 onClick={(e) =>
-                                    openLink({
-                                        event: e,
+                                    openLink(e, {
                                         username: comment.replyAuthorName!,
                                     })
                                 }
@@ -80,30 +84,28 @@ export const CommentCard = ({
                     &nbsp;
                     {formatRelativeDateTime(comment.createdAt)}
                 </div>
-                <a
-                    href="#"
-                    onClick={(e) =>
-                        openLink({ event: e, postId: comment.postId })
-                    }
-                    className="text-neutral-content line-clamp-2"
-                >
-                    {post?.title ?? '[deleted]'}
-                </a>
-                <div className="text-neutral-content-strong line-clamp-3">
-                    {comment.body}
-                </div>
-                <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-3">
-                        <div className="flex items-center gap-1 text-neutral-content-weakest">
-                            <UpvoteIcon />
-                            <span className="text-neutral-content-strong">
-                                {comment.score}
-                            </span>
-                            <DownvoteIcon />
-                        </div>
+            </div>
+            <a
+                href={linkForThing({ postId: comment.postId })}
+                onClick={(e) => openLink(e, { postId: comment.postId })}
+                className={`text-primary-plain hover:text-primary-plain-hovered underline ${!isExpanded && 'line-clamp-2'}`}
+            >
+                {post?.title ?? '[deleted]'}
+            </a>
+            <div className={`text-neutral-content-strong ${!isExpanded && 'line-clamp-3'}`}>
+                {comment.body}
+            </div>
+            <div className="flex justify-between items-center">
+                <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-1 text-neutral-content-weakest">
+                        <UpvoteIcon />
+                        <span className="text-neutral-content-strong">
+                            {comment.score}
+                        </span>
+                        <DownvoteIcon />
                     </div>
-                    <div className="flex justify-end items-center gap-2"></div>
                 </div>
+                <div className="flex justify-end items-center gap-2"></div>
             </div>
         </div>
     );

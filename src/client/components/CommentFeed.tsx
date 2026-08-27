@@ -11,14 +11,15 @@ import { StrictMode, useState, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import { LoadingSpinner } from './LoadingSpinner';
 import { ApiResponse, InitCommentFeedResponse } from '../../shared/api';
-import { ListHeader } from './ListHeader';
 import { useCommentData } from '../hooks/useCommentData';
-import { getWebViewMode } from '@devvit/web/client';
-import { InlineCommentList } from './InlineCommentList';
-import { ExpandedCommentList } from './ExpandedCommentList';
+import { CommentList } from './CommentList';
+import {
+    getWebViewMode,
+    addWebViewModeListener,
+    removeWebViewModeListener,
+} from '@devvit/web/client';
 
 export const CommentFeed = () => {
-
     // Initialize feed basic data (subinfo, user status, etc.)
     const [feedInit, setFeedInit] = useState<
         InitCommentFeedResponse | null | undefined
@@ -43,14 +44,23 @@ export const CommentFeed = () => {
 
     // Use the global comment data hook
     const commentDataHook = useCommentData();
-    const {
-        loading,
-        getCurrentIndex,
-        pageSize
-    } = commentDataHook;
+    const { loading } = commentDataHook;
 
-    // Get expanded view state
-    const isExpanded = getWebViewMode() === 'expanded';
+    // Determine expanded mode state
+    const [isExpanded, setIsExpanded] = useState<boolean>(
+        () => getWebViewMode() === 'expanded'
+    );
+
+    // Listen for expand mode change (mostly closed via Reddit native close button)
+    useEffect(() => {
+        const listener = (newMode: 'expanded' | 'inline') => {
+            setIsExpanded(newMode === 'expanded');
+        };
+        addWebViewModeListener(listener);
+        return () => {
+            removeWebViewModeListener(listener);
+        };
+    }, []);
 
     // Handle loading or error
     if (!feedInit || loading) {
@@ -83,15 +93,7 @@ export const CommentFeed = () => {
     return (
         <div className="w-full h-full overflow-hidden">
             <div className="flex flex-col h-full">
-                <ListHeader
-                    getCurrentIndex={getCurrentIndex}
-                    pageSize={pageSize}
-                    subInfo={feedInit.subInfo}
-                />
-                {isExpanded
-                    ? (<ExpandedCommentList commentDataHook={commentDataHook} />)
-                    : (<InlineCommentList commentDataHook={commentDataHook} />)
-                }
+                <CommentList isExpanded={isExpanded} setIsExpanded={setIsExpanded} commentDataHook={commentDataHook} />
             </div>
         </div>
     );

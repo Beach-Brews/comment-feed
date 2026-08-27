@@ -33,23 +33,29 @@ const EmptySample: CommentListResponse = {
 const TestPostIds = [genT3(), genT3(), genT3(), genT3(),
     genT3(), genT3(), genT3(), genT3()];
 const SampleUsersMap = {
-    'User0': {
-        snoovatar: 'https://preview.redd.it/snoovatar/avatars/39b6f849-b2de-4c8f-9c97-4946152dc878-headshot.png?width=64&height=64&crop=smart&auto=webp&s=b37e8128af3c3fac9c6e6357291d30911a7f735f',
+    'User-Name-More-0': {
+        snoovatar:
+            'https://preview.redd.it/snoovatar/avatars/39b6f849-b2de-4c8f-9c97-4946152dc878-headshot.png?width=64&height=64&crop=smart&auto=webp&s=b37e8128af3c3fac9c6e6357291d30911a7f735f',
     },
-    'User1': {
-        snoovatar: 'https://preview.redd.it/snoovatar/avatars/39b6f849-b2de-4c8f-9c97-4946152dc878-headshot.png?width=64&height=64&crop=smart&auto=webp&s=b37e8128af3c3fac9c6e6357291d30911a7f735f',
+    'User-Name-More-1': {
+        snoovatar:
+            'https://preview.redd.it/snoovatar/avatars/39b6f849-b2de-4c8f-9c97-4946152dc878-headshot.png?width=64&height=64&crop=smart&auto=webp&s=b37e8128af3c3fac9c6e6357291d30911a7f735f',
     },
-    'User2': {
-        snoovatar: 'https://preview.redd.it/snoovatar/avatars/39b6f849-b2de-4c8f-9c97-4946152dc878-headshot.png?width=64&height=64&crop=smart&auto=webp&s=b37e8128af3c3fac9c6e6357291d30911a7f735f',
+    'User-Name-More-2': {
+        snoovatar:
+            'https://preview.redd.it/snoovatar/avatars/39b6f849-b2de-4c8f-9c97-4946152dc878-headshot.png?width=64&height=64&crop=smart&auto=webp&s=b37e8128af3c3fac9c6e6357291d30911a7f735f',
     },
-    'User3': {
-        snoovatar: 'https://preview.redd.it/snoovatar/avatars/39b6f849-b2de-4c8f-9c97-4946152dc878-headshot.png?width=64&height=64&crop=smart&auto=webp&s=b37e8128af3c3fac9c6e6357291d30911a7f735f',
+    'User-Name-More-3': {
+        snoovatar:
+            'https://preview.redd.it/snoovatar/avatars/39b6f849-b2de-4c8f-9c97-4946152dc878-headshot.png?width=64&height=64&crop=smart&auto=webp&s=b37e8128af3c3fac9c6e6357291d30911a7f735f',
     },
-    'User4': {
-        snoovatar: 'https://preview.redd.it/snoovatar/avatars/39b6f849-b2de-4c8f-9c97-4946152dc878-headshot.png?width=64&height=64&crop=smart&auto=webp&s=b37e8128af3c3fac9c6e6357291d30911a7f735f',
+    'User-Name-More-4': {
+        snoovatar:
+            'https://preview.redd.it/snoovatar/avatars/39b6f849-b2de-4c8f-9c97-4946152dc878-headshot.png?width=64&height=64&crop=smart&auto=webp&s=b37e8128af3c3fac9c6e6357291d30911a7f735f',
     },
-    'User5': {
-        snoovatar: 'https://preview.redd.it/snoovatar/avatars/39b6f849-b2de-4c8f-9c97-4946152dc878-headshot.png?width=64&height=64&crop=smart&auto=webp&s=b37e8128af3c3fac9c6e6357291d30911a7f735f',
+    'User-Name-More-5': {
+        snoovatar:
+            'https://preview.redd.it/snoovatar/avatars/39b6f849-b2de-4c8f-9c97-4946152dc878-headshot.png?width=64&height=64&crop=smart&auto=webp&s=b37e8128af3c3fac9c6e6357291d30911a7f735f',
     },
 } as Record<string, UserInfoDto>;
 
@@ -70,7 +76,7 @@ export default defineMock([
     {
         url: '/api/comments',
         method: 'GET',
-        delay: 5000,
+        delay: 2000,
         body: ({ query }) => {
             const { p = 1, s = 25 } = query;
             const comments: CommentDto[] = [];
@@ -78,19 +84,23 @@ export default defineMock([
             for (let i = 0; i < size; ++i) {
                 comments.push({
                     id: genT1(),
-                    postId: TestPostIds[Math.floor(Math.random()*TestPostIds.length)] ?? genT3(),
-                    authorName: `User${Math.floor(Math.random()*15)}`,
-                    replyAuthorName: Math.random() < .5
-                        ? `User${Math.floor(Math.random()*15)}`
-                        : null,
-                    body: `Page ${p} Comment ${i}`,
+                    postId:
+                        TestPostIds[
+                            Math.floor(Math.random() * TestPostIds.length)
+                        ] ?? genT3(),
+                    authorName: `User-Name-More-${Math.floor(Math.random() * 15)}`,
+                    replyAuthorName:
+                        Math.random() < 0.5
+                            ? `User-Name-More-${Math.floor(Math.random() * 15)}`
+                            : null,
+                    body: `Page ${p} Comment ${i} with lots of text that hopefully spans over multiple lines. It's something I need too make sure I test to ensure that I can actually fit all of them in the cards when it spans over multiple lines.`,
                     createdAt: Date.now(),
-                    score: Math.floor(Math.random()*1000),
+                    score: Math.floor(Math.random() * 1000),
                     edited: false,
                     locked: false,
                     removed: false,
                     spam: false,
-                    permalink: ''
+                    permalink: '',
                 });
             }
             const users = comments.reduce((m, c) => {
@@ -98,7 +108,7 @@ export default defineMock([
                 return m;
             }, {} as UserNameToUserInfoMap);
             const posts = comments.reduce((m, c) => {
-                m[c.postId] = { title: `Post with a title and id ${c.postId}`};
+                m[c.postId] = { title: `Post with a title and id ${c.postId} which is longer to make sure it spans over a few lines like it would cause the title to wrap onto lines and cause extra spacing.`};
                 return m;
             }, {} as PostIdToPostInfoMap);
             return {

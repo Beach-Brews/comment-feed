@@ -6,7 +6,13 @@
  */
 
 import { Hono } from 'hono';
-import { context, reddit, type TaskResponse, type Comment } from '@devvit/web/server';
+import {
+    context,
+    reddit,
+    type TaskRequest,
+    type TaskResponse,
+    type Comment,
+} from '@devvit/web/server';
 import { Logger } from '../utils/Logger';
 import { AppSettings } from '../utils/AppSettings';
 import { addComment } from '../utils/redisUtils';
@@ -22,14 +28,18 @@ class TimeLimitError extends Error {
 jobs.post('/preload', async (c) => {
     const logger = await Logger.Create('Job - Preload');
     try {
+        const { data } = await c.req.json<TaskRequest<{ subredditName: string | null }>>();
         logger.debug('Starting to preload comments from recent posts');
 
         const start = Date.now();
         let count = 0;
-        const hotPosts = reddit.getHotPosts({
-            subredditName: context.subredditName,
+        const postsList = reddit.getRisingPosts({
+            subredditName:
+                data?.subredditName && data.subredditName.length > 0
+                    ? data.subredditName
+                    : context.subredditName,
             limit: 1000,
-            pageSize: 10
+            pageSize: 10,
         });
 
         const ignoredUsers = await AppSettings.GetUserIgnoreList();
@@ -54,9 +64,13 @@ jobs.post('/preload', async (c) => {
         };
 
         try {
-            while (hotPosts.hasMore && count < targetCount) {
-                for await (const post of hotPosts) {
-                    if (post.removed || post.spam) continue;
+            while (postsList.hasMore && count < targetCount) {
+                for await (const post of postsList) {
+                    if (post.removed || post.spam ||
+                        post.title.toLowerCase() === '[deleted]' ||
+                        post.title.toLowerCase() === '[removed]'
+                    )
+                        continue;
                     for await (const comment of post.comments) {
                         await addCommentRecursive(comment);
                     }

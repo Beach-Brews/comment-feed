@@ -57,7 +57,8 @@ triggers.post('/on-app-install', async (c) => {
 
         await scheduler.runJob({
             name: 'preload',
-            runAt: new Date(Date.now() + 1000 + (Math.random() * 3000))
+            runAt: new Date(Date.now() + 1000 + (Math.random() * 3000)),
+            data: { subredditName: null }
         });
 
         logger.info('Install successful');
