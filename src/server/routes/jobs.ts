@@ -16,7 +16,11 @@ import {
 } from '@devvit/web/server';
 import { Logger } from '../utils/Logger';
 import { AppSettings, LogLevel } from '../utils/AppSettings';
-import { addComment, commentCount } from '../utils/redisUtils';
+import {
+    addComment,
+    commentCount,
+    checkAppUpdate
+} from '../utils/redisUtils';
 
 export const jobs = new Hono();
 
@@ -150,6 +154,20 @@ jobs.post('/preload', async (c) => {
         }
 
         logger.info(`Preloaded a total of ${count}`);
+        return c.json<TaskResponse>({ }, 200);
+
+    } catch (error) {
+        logger.error(`Error preloading comments: `, error);
+        return c.json<TaskResponse>({ }, 500);
+    }
+});
+
+// ============  Hourly Check ============
+
+jobs.post('/hourly-checks', async (c) => {
+    const logger = await Logger.Create('Job - Hourly Checks');
+    try {
+        await checkAppUpdate();
         return c.json<TaskResponse>({ }, 200);
 
     } catch (error) {

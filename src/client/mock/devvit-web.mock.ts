@@ -1,5 +1,8 @@
-﻿export const context = {
-    subredditName: 'UAT4CommentList',
+﻿type ViewModelListener = (newMode: 'expanded' | 'inline') => void;
+let listeners: ViewModelListener[] = [];
+
+export const context = {
+    subredditName: 'UAT4CommentFeed',
     appVersion: 'LocalVite'
 };
 
@@ -13,16 +16,18 @@ export const getWebViewMode = () => {
 
 export const requestExpandedMode = () => {
     window.location.hash = 'expanded';
-    window.location.reload();
+    listeners.forEach(l => l('expanded'));
 };
 
 export const exitExpandedMode = () => {
     window.location.hash = 'inline';
-    window.location.reload();
+    listeners.forEach((l) => l('inline'));
 };
 
-export const addWebViewModeListener = () => {
+export const addWebViewModeListener = (listener: ViewModelListener) => {
+    listeners.push(listener);
 };
 
-export const removeWebViewModeListener = () => {
+export const removeWebViewModeListener = (_listener: ViewModelListener) => {
+    listeners = [];
 };

@@ -21,6 +21,7 @@ import { getCommentInfoByIds } from '../utils/commentUtils';
 import { Logger } from '../utils/Logger';
 import {
     clearAllComments,
+    getAppUpdateInfo,
     getCommentIdsForPage,
 } from '../utils/redisUtils';
 import { isMod } from '../utils/userUtils';
@@ -103,9 +104,11 @@ api.get('/init', async (c) => {
         )) as InitCommentFeedResponse;
         logger.debug('Subreddit info: ', result);
 
-        // Only add isMod if actually a mod (security)
-        if (userIsMod)
+        // Only add isMod and update info if actually a mod (security)
+        if (userIsMod) {
             result.isMod = true;
+            result.updateInfo = await getAppUpdateInfo();
+        }
 
         return c.json<ApiResponse<InitCommentFeedResponse>>(
             {
@@ -171,7 +174,8 @@ api.get('/comments', zValidator('query', CommentApiParamSchema), async (c) => {
             );
 
             // Fetch comment and user data
-            const commentData = await getCommentInfoByIds(commentPage.comments);
+            const commentData =
+                await getCommentInfoByIds(commentPage.comments, userIsMod);
 
             // Log processing time
             const exTime = Date.now() - start;

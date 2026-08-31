@@ -18,6 +18,11 @@ import {
     addWebViewModeListener,
     removeWebViewModeListener,
 } from '@devvit/web/client';
+import {
+    CommentFeedContextProps,
+    CommentFeedProvider,
+} from '../hooks/CommentFeedContextProvider';
+import { UpdateNotice } from './UpdateNotice';
 
 export const CommentFeed = () => {
     // Initialize feed basic data (subinfo, user status, etc.)
@@ -65,7 +70,7 @@ export const CommentFeed = () => {
     // Handle loading or error
     if (!feedInit || loading) {
         return (
-            <div className="flex flex-col gap-4 justify-center items-center h-full">
+            <div className="flex flex-col gap-4 justify-center items-center h-dvh">
                 {feedInit === undefined || loading ? (
                     <>
                         <LoadingSpinner className="size-12" />
@@ -90,12 +95,22 @@ export const CommentFeed = () => {
         );
     }
 
+    const feedContext = {
+        feedInit,
+        commentDataHook,
+        isExpanded,
+        setIsExpanded
+    } satisfies CommentFeedContextProps;
+
     return (
-        <div className="w-full h-full overflow-hidden">
-            <div className="flex flex-col h-full">
-                <CommentList isExpanded={isExpanded} setIsExpanded={setIsExpanded} commentDataHook={commentDataHook} />
+        <CommentFeedProvider context={feedContext}>
+            <div className="w-full h-dvh overflow-hidden">
+                <div className="flex flex-col h-dvh">
+                    {feedInit.updateInfo && <UpdateNotice />}
+                    <CommentList />
+                </div>
             </div>
-        </div>
+        </CommentFeedProvider>
     );
 };
 

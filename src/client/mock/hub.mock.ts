@@ -69,7 +69,12 @@ export default defineMock([
             message: 'OK',
             result: {
                 subInfo: SampleSubInfo,
-                isMod: true
+                isMod: true,
+                updateInfo: {
+                    latestVersion: '0.1.1',
+                    urgent: true,
+                    message: 'Update notice goes here!'
+                }
             },
         } satisfies ApiResponse<InitCommentFeedResponse>,
     },
@@ -82,6 +87,7 @@ export default defineMock([
             const comments: CommentDto[] = [];
             const size = p == 5 ? 10 : s;
             for (let i = 0; i < size; ++i) {
+                const reportCount = Math.random() > 0.5 ? Math.floor(Math.random() * 3) : 0;
                 comments.push({
                     id: genT1(),
                     postId:
@@ -96,11 +102,20 @@ export default defineMock([
                     body: `Page ${p} Comment ${i} with lots of text that hopefully spans over multiple lines. It's something I need too make sure I test to ensure that I can actually fit all of them in the cards when it spans over multiple lines.`,
                     createdAt: Date.now(),
                     score: Math.floor(Math.random() * 1000),
-                    edited: false,
-                    locked: false,
-                    removed: false,
-                    spam: false,
+                    edited: Math.random() > 0.5,
+                    locked: Math.random() > 0.5,
                     permalink: '',
+                    distinguished: Math.random() > 0.5,
+                    distinguishedBy: 'ModeratorName',
+                    modInfo: {
+                        approved: Math.random() > 0.5,
+                        stickied: Math.random() > 0.5,
+                        numReports: reportCount,
+                        userReportReasons: reportCount > 0 ? ['Test Report Reason'] : [],
+                        modReports: reportCount > 0 ? [['Mod Reason', 'Mod Name']] : [],
+                        ignoringReports: Math.random() > 0.5,
+                        collapsedBecauseCrowdControl: Math.random() > 0.5
+                    },
                 });
             }
             const users = comments.reduce((m, c) => {

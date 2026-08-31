@@ -5,22 +5,15 @@
  * License: BSD-3-Clause
  */
 
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { CommentCard } from './CommentCard';
 import { ListPagination } from './ListPagination';
 import { CommentDto, Pagination } from '../../shared/api';
-import { CommentDataHook } from '../hooks/useCommentData';
 import { LoadingSpinner } from './LoadingSpinner';
+import { useCommentFeed } from '../hooks/CommentFeedContextProvider';
 
-export const CommentList = ({
-    commentDataHook,
-    isExpanded,
-    setIsExpanded,
-}: {
-    commentDataHook: CommentDataHook;
-    isExpanded: boolean;
-    setIsExpanded: Dispatch<SetStateAction<boolean>>;
-}) => {
+export const CommentList = () => {
+    const { isExpanded, commentDataHook } = useCommentFeed();
     const { pageSize: dataPageSize } = commentDataHook;
     const pageSize = isExpanded ? dataPageSize : 2;
 
@@ -44,7 +37,7 @@ export const CommentList = ({
     const updatePage = (p: number) => {
         setPagination((s) => ({ ...s, page: p }));
         setComments(undefined);
-        commentDataHook.setCurrentIndex((p - 1) * 2);
+        commentDataHook.setCurrentIndex((p - 1) * pageSize);
         void loadComments();
     };
 
@@ -67,6 +60,7 @@ export const CommentList = ({
                 : (
                     <div className="flex-1 relative grow h-[0%]">
                         <div
+                            key={`comment-page-${pagination.page}`}
                             className={`grid grid-cols-1 gap-2 p-2 ${isExpanded ? 'overflow-y-auto' : 'overflow-hidden'} h-full`}
                         >
                             {comments.length > 0 ? (
@@ -79,13 +73,7 @@ export const CommentList = ({
                                                 : ''
                                         }
                                     >
-                                        <CommentCard
-                                            key={s.id}
-                                            isExpanded={isExpanded}
-                                            comment={s}
-                                            post={commentDataHook.posts[s.postId]}
-                                            author={commentDataHook.users[s.authorName]}
-                                        />
+                                        <CommentCard key={s.id} comment={s} />
                                     </div>
                                 ))
                             ) : (
@@ -103,8 +91,6 @@ export const CommentList = ({
                 )
             }
             <ListPagination
-                isExpanded={isExpanded}
-                setIsExpanded={setIsExpanded}
                 pagination={pagination}
                 updatePage={updatePage}
                 loading={comments === undefined}

@@ -34,20 +34,15 @@ export type UserInfoDto = {
     //authorFlair: FlairDto | undefined;
 };
 
-/*
-export type PostModInfoDto = {
+export type ModInfoDto = {
     approved: boolean;
-    removed: boolean;
     stickied: boolean;
-    spam: boolean;
     numReports: number;
     userReportReasons: string[];
     modReports: [string, string][];
-    modReportReasons: string[];
     ignoringReports: boolean;
     collapsedBecauseCrowdControl: boolean;
 };
-*/
 
 export type PostInfoDto = {
     title: string;
@@ -63,11 +58,10 @@ export type CommentDto = {
     score: number;
     edited: boolean;
     locked: boolean;
-    removed: boolean;
-    spam: boolean;
     permalink: string;
-    //distinguishedBy: string | undefined;
-    //modInfo?: PostModInfoDto | undefined;
+    distinguished: boolean;
+    distinguishedBy: string | undefined;
+    modInfo?: ModInfoDto | undefined;
 };
 
 export type UserNameToUserInfoMap = Record<string, UserInfoDto>;
@@ -89,9 +83,16 @@ export type CommentListResponse = CommentGroupDto & {
     pagination: Pagination;
 };
 
+export type AppUpdateInfoDto = {
+    latestVersion: string;
+    urgent: boolean;
+    message?: string | null | undefined;
+};
+
 export type InitCommentFeedResponse = {
     subInfo: SubredditInfoDto;
     isMod?: true | undefined;
+    updateInfo?: AppUpdateInfoDto | undefined;
 };
 
 export type ModCmdRequest = {

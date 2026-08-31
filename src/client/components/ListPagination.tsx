@@ -12,25 +12,24 @@ import {
     ChevronRightIcon,
 } from '@heroicons/react/24/solid';
 import { Pagination } from '../../shared/api';
-import { Dispatch, MouseEvent, SetStateAction } from 'react';
+import { MouseEvent } from 'react';
 import {
     exitExpandedMode,
     requestExpandedMode,
 } from '@devvit/web/client';
+import { useCommentFeed } from '../hooks/CommentFeedContextProvider';
 
 export const ListPagination = ({
     pagination,
     updatePage,
     loading,
-    isExpanded,
-    setIsExpanded,
 }: {
     pagination: Pagination;
     updatePage: (page: number) => void;
     loading: boolean;
-    isExpanded: boolean;
-    setIsExpanded: Dispatch<SetStateAction<boolean>>;
 }) => {
+    const { isExpanded, setIsExpanded, commentDataHook } = useCommentFeed();
+    const { getCurrentIndex, pageSize } = commentDataHook;
     const launchExpanded = (e: MouseEvent) => {
         // If in expanded mode, exit
         if (isExpanded) {
@@ -46,8 +45,8 @@ export const ListPagination = ({
 
         if (originalUrl) {
             const url = new URL(originalUrl, window.location.href);
-            //url.searchParams.set('i', getCurrentIndex().toString());
-            //url.searchParams.set('s', pageSize.toString());
+            url.searchParams.set('i', getCurrentIndex().toString());
+            url.searchParams.set('s', pageSize.toString());
             entrypoints.app = `${url}`;
         }
 

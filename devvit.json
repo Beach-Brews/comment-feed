@@ -41,6 +41,9 @@
         "tasks": {
             "preload": {
                 "endpoint": "/internal/jobs/preload"
+            },
+            "hourly-checks": {
+                "endpoint": "/internal/jobs/hourly-checks"
             }
         }
     },

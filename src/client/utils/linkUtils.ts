@@ -61,6 +61,7 @@ export const linkForThing = (options: LinkOptions) => {
     return '#';
 };
 
+// Shoutout to Xenccc for saving the day again! This little trick allows users to ctrl+click to open in a new tab.
 const isMeta = (e: MouseEvent) =>
     e.button !== 0 || e.ctrlKey || e.altKey || e.metaKey || e.shiftKey;
 

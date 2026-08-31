@@ -5,32 +5,39 @@
 * License: BSD-3-Clause
 */
 
-import { CommentDto, PostInfoDto, UserInfoDto } from '../../shared/api';
+import { CommentDto } from '../../shared/api';
 import { useState } from 'react';
 import { formatRelativeDateTime } from '../utils/dateFormat';
-import { DownvoteIcon, UpvoteIcon } from './CustomIcons';
+import {
+    DownvoteIcon,
+    FlagIcon,
+    ModShieldIcon,
+    UpvoteIcon,
+} from './CustomIcons';
 import { linkForThing, openLink } from '../utils/linkUtils';
+import { useCommentFeed } from '../hooks/CommentFeedContextProvider';
+import { snoovatarForUser } from '../../shared/soonvatarForUser';
+import {
+    LockClosedIcon,
+    PencilIcon,
+} from '@heroicons/react/24/outline';
 
 export const CommentCard = ({
     comment,
-    post,
-    author,
-    isExpanded,
 }: {
     comment: CommentDto;
-    post: PostInfoDto | undefined;
-    author: UserInfoDto | undefined;
-    isExpanded: boolean;
 }) => {
-    const [defaultSnoo] = useState<string>(
-        () =>
-            `https://www.redditstatic.com/avatars/defaults/v2/avatar_default_${Math.floor(Math.random() * 8)}.png`
-    );
+    const { isExpanded, commentDataHook, feedInit } = useCommentFeed();
+    const post = commentDataHook.posts[comment.postId];
+    const author = commentDataHook.users[comment.authorName];
+
+    const [defaultSnoo] = useState<string>(() => snoovatarForUser(comment.authorName));
+
+    const { modInfo } = comment;
+
     return (
         <div
-            onClick={(e) =>
-                openLink(e, { path: comment.permalink })
-            }
+            onClick={(e) => openLink(e, { path: comment.permalink })}
             className="w-full flex flex-col gap-2 p-2 text-sm break-words rounded-xl hover:cursor-pointer hover:bg-neutral-background-hovered"
         >
             <div className="flex gap-2 items-center text-neutral-content-weak">
@@ -94,6 +101,22 @@ export const CommentCard = ({
             >
                 {comment.body}
             </div>
+            {isExpanded &&
+                feedInit.isMod &&
+                modInfo &&
+                modInfo.numReports > 0 && (
+                    <div className="flex gap-1 px-2 py-1 rounded-md bg-caution-background text-caution-onbackground">
+                        <div className="pt-1"><FlagIcon /></div>
+                        <div>
+                            {modInfo.userReportReasons.map((r, i) =>
+                                <div key={`ur${i}`}>{r}</div>)
+                            }
+                            {modInfo.modReports.map((r, i) =>
+                                <div key={`ur${i}`}>{r[0]} - {r[1]}</div>)
+                            }
+                        </div>
+                    </div>
+                )}
             <div className="flex justify-between items-center">
                 <div className="flex items-center gap-3">
                     <div className="flex items-center gap-1 text-neutral-content-weakest">
@@ -112,8 +135,28 @@ export const CommentCard = ({
                     >
                         permalink
                     </a>
+                    {comment.edited && (
+                        <PencilIcon className="size-4 stroke-2" />
+                    )}
+                    {comment.locked && (
+                        <LockClosedIcon className="size-4 stroke-2 text-caution-plain" />
+                    )}
                 </div>
-                <div className="flex justify-end items-center gap-2"></div>
+                <div className="flex justify-end items-center gap-4">
+                    {feedInit.isMod && (
+                        <>
+                            {!isExpanded &&
+                                modInfo &&
+                                modInfo.numReports > 0 && (
+                                    <div className="flex items-center gap-1 px-2 py-1 rounded-md bg-caution-background text-caution-onbackground">
+                                        <FlagIcon />
+                                        {modInfo.numReports}
+                                    </div>
+                                )}
+                            <ModShieldIcon />
+                        </>
+                    )}
+                </div>
             </div>
         </div>
     );

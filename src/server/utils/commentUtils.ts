@@ -104,7 +104,7 @@ const getUserInfoMap = async (
     return Object.fromEntries(userInfos);
 };
 
-export const getCommentInfoByIds = async (commentIds: T1[]): Promise<CommentGroupDto> => {
+export const getCommentInfoByIds = async (commentIds: T1[], userIsMod: boolean): Promise<CommentGroupDto> => {
 
     // Get ignore list setting
     const ignoredUsers = await AppSettings.GetUserIgnoreList();
@@ -112,7 +112,7 @@ export const getCommentInfoByIds = async (commentIds: T1[]): Promise<CommentGrou
     // Get comments from the passed in IDs
     const comments = (
         await Promise.all(commentIds.map((i) => reddit.getCommentById(i)))
-    ).filter((c) => !c.removed && !c.spam && !ignoredUsers.has(c.authorName) &&
+    ).filter((c) => !c.removed && !c.spam && !ignoredUsers.has(c.authorName.toLowerCase()) &&
         c.body !== '[deleted]' && c.body !== '[removed]');
 
     // Call reddit API on users and posts
@@ -127,23 +127,38 @@ export const getCommentInfoByIds = async (commentIds: T1[]): Promise<CommentGrou
 
     // Convert to DTOs
     const commentDtos = comments.map(
-        (c) =>
-            ({
+        (c) => {
+            const commentData: CommentDto = {
                 id: c.id,
                 postId: c.postId,
                 authorName: c.authorName,
                 replyAuthorName: c.parentId.startsWith(`t1_`)
-                    ? replyAuthors[c.parentId as T1] ?? null
+                    ? (replyAuthors[c.parentId as T1] ?? null)
                     : null,
                 body: c.body,
                 createdAt: c.createdAt.getTime(),
                 score: c.score,
                 edited: c.edited,
                 locked: c.locked,
-                removed: c.removed,
-                spam: c.spam,
                 permalink: c.permalink,
-            }) satisfies CommentDto
+                distinguished: c.isDistinguished(),
+                distinguishedBy: c.distinguishedBy,
+            } satisfies CommentDto;
+
+            if (userIsMod) {
+                commentData.modInfo = {
+                    approved: c.approved,
+                    stickied: c.stickied,
+                    numReports: c.numReports,
+                    userReportReasons: c.userReportReasons,
+                    modReports: c.modReports.map(r => ([r.reason, r.author] as const)),
+                    ignoringReports: c.ignoringReports,
+                    collapsedBecauseCrowdControl: c.collapsedBecauseCrowdControl
+                };
+            }
+
+            return commentData;
+        }
     );
 
     return {
