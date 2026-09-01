@@ -6,7 +6,7 @@
  */
 
 import { T1 } from '../../shared/types';
-import { reddit, Comment, Post } from '@devvit/web/server';
+import { reddit, Comment } from '@devvit/web/server';
 import {
     CommentGroupDto,
     CommentDto,
@@ -35,13 +35,13 @@ const getReplyAuthorMap = async (
     if (replyIds.length <= 0) return authorMap;
 
     // Fetch the comment details for these T1s
-    // const replyComments = await Promise.all(
-    //     replyIds.map(i => reddit.getCommentById(i))
-    // );
-    const replyComments: Comment[] = [];
-    for (const id of replyIds) {
-        replyComments.push(await reddit.getCommentById(id));
-    }
+    const replyComments = await Promise.all(
+        replyIds.map(i => reddit.getCommentById(i))
+    );
+    // const replyComments: Comment[] = [];
+    // for (const id of replyIds) {
+    //     replyComments.push(await reddit.getCommentById(id));
+    // }
 
     // Create map of commentId to author username
     return replyComments.reduce(
@@ -60,13 +60,13 @@ const getPostInfoMap = async (
     const postIds = toDistinct(comments.map((c) => c.postId));
 
     // Fetch the post details for the postIds
-    // const posts = await Promise.all(
-    //     postIds.map(i => reddit.getPostById(i))
-    // );
-    const posts: Post[] = [];
-    for (const id of postIds) {
-        posts.push(await reddit.getPostById(id));
-    }
+    const posts = await Promise.all(
+        postIds.map(i => reddit.getPostById(i))
+    );
+    // const posts: Post[] = [];
+    // for (const id of postIds) {
+    //     posts.push(await reddit.getPostById(id));
+    // }
 
     // Create map of postIds to post infos
     return posts.reduce(
@@ -87,18 +87,18 @@ const getUserInfoMap = async (
     const usernames = toDistinct(comments.map((c) => c.authorName));
 
     // Fetch the user details for the usernames
-    // const userInfos = await Promise.all(
-    //     usernames.map(async u => [
-    //         u,
-    //         {
-    //             snoovatar: await reddit.getSnoovatarUrl(u)
-    //         } satisfies UserInfoDto
-    //     ] as const)
-    // );
-    const userInfos: [string, UserInfoDto][] = [];
-    for (const user of usernames) {
-        userInfos.push([user, { snoovatar: await reddit.getSnoovatarUrl(user) }]);
-    }
+    const userInfos = await Promise.all(
+        usernames.map(async u => [
+            u,
+            {
+                snoovatar: await reddit.getSnoovatarUrl(u)
+            } satisfies UserInfoDto
+        ] as const)
+    );
+    // const userInfos: [string, UserInfoDto][] = [];
+    // for (const user of usernames) {
+    //     userInfos.push([user, { snoovatar: await reddit.getSnoovatarUrl(user) }]);
+    // }
 
     // Create map of usernames to user infos
     return Object.fromEntries(userInfos);
@@ -116,14 +116,14 @@ export const getCommentInfoByIds = async (commentIds: T1[], userIsMod: boolean):
         c.body !== '[deleted]' && c.body !== '[removed]');
 
     // Call reddit API on users and posts
-    // const [replyAuthors, postMap, userMap] = await Promise.all([
-    //     getReplyAuthorMap(comments),
-    //     getPostInfoMap(comments),
-    //     getUserInfoMap(comments)
-    // ]);
-    const replyAuthors = await getReplyAuthorMap(comments);
-    const postMap = await getPostInfoMap(comments);
-    const userMap = await getUserInfoMap(comments);
+    const [replyAuthors, postMap, userMap] = await Promise.all([
+        getReplyAuthorMap(comments),
+        getPostInfoMap(comments),
+        getUserInfoMap(comments)
+    ]);
+    //const replyAuthors = await getReplyAuthorMap(comments);
+    //const postMap = await getPostInfoMap(comments);
+    //const userMap = await getUserInfoMap(comments);
 
     // Convert to DTOs
     const commentDtos = comments.map(
