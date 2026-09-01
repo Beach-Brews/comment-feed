@@ -11,7 +11,7 @@ import { formatRelativeDateTime } from '../utils/dateFormat';
 import {
     DownvoteIcon,
     FlagIcon,
-    ModShieldIcon,
+    //ModShieldIcon,
     UpvoteIcon,
 } from './CustomIcons';
 import { linkForThing, openLink } from '../utils/linkUtils';
@@ -153,7 +153,7 @@ export const CommentCard = ({
                                         {modInfo.numReports}
                                     </div>
                                 )}
-                            <ModShieldIcon />
+                            {/*<ModShieldIcon />*/}
                         </>
                     )}
                 </div>

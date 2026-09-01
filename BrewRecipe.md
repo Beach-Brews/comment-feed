@@ -9,7 +9,7 @@
   * Mention desktop Ctrl/Cmd+Click
 * Images, links and other formatting does not render properly
   * Need to add a markdown parser
-* Expand view does not go to current page
+* Expand view does not go to current page / comment. Closing does not stay in same (when available, not possible on iOS)
 * Automoderator appearing in comment list still?
 
 ## Features

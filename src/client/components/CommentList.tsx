@@ -80,7 +80,7 @@ export const CommentList = () => {
                                 <div className="text-content-neutral flex flex-col gap-2 items-center">
                                     <div>End of comment feed.</div>
                                     <img
-                                        className="w-1/2"
+                                        className="w-1/2 max-h-3/4 h-auto object-contain"
                                         src="snoo-thumbs-up.png"
                                         alt="Snoo Thumbs Up"
                                     />
