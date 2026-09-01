@@ -6,7 +6,7 @@
  */
 
 import { Hono } from 'hono';
-import { context, scheduler } from '@devvit/web/server';
+import { context, scheduler, redis } from '@devvit/web/server';
 import { MessageResponse, ModCmdRequest } from '../../../shared/api';
 import { Logger } from '../../utils/Logger';
 import { clearAllComments } from '../../utils/redisUtils';
@@ -26,6 +26,16 @@ modCmd.post('/mod-cmd', async (c) => {
         logger.debug('Received mod command: ', cmd);
 
         switch (cmd) {
+            case 'update-check':
+                // Schedule job
+                await redis.del('app:updateInfo');
+                await scheduler.runJob({
+                    name: 'hourly-checks',
+                    runAt: new Date(Date.now() + 1000 + Math.random() * 3000),
+                });
+                logger.info('Scheduled hourly check job');
+                break;
+
             case 'preload':
                 // Schedule job
                 await scheduler.runJob({
@@ -37,6 +47,7 @@ modCmd.post('/mod-cmd', async (c) => {
                 break;
 
             case 'clear':
+                await redis.del('app:updateInfo');
                 await clearAllComments();
                 logger.info('Cleared all comments');
                 break;

@@ -105,15 +105,17 @@ export const CommentCard = ({
                 feedInit.isMod &&
                 modInfo &&
                 modInfo.numReports > 0 && (
-                    <div className="flex gap-1 px-2 py-1 rounded-md bg-caution-background text-caution-onbackground">
-                        <div className="pt-1"><FlagIcon /></div>
-                        <div>
-                            {modInfo.userReportReasons.map((r, i) =>
-                                <div key={`ur${i}`}>{r}</div>)
-                            }
-                            {modInfo.modReports.map((r, i) =>
-                                <div key={`ur${i}`}>{r[0]} - {r[1]}</div>)
-                            }
+                    <div className="flex">
+                        <div className="flex gap-1 px-2 py-1 rounded-md bg-caution-background text-caution-onbackground">
+                            <div className="pt-1"><FlagIcon /></div>
+                            <div>
+                                {modInfo.userReportReasons.map((r, i) =>
+                                    <div key={`ur${i}`}>{r}</div>)
+                                }
+                                {modInfo.modReports.map((r, i) =>
+                                    <div key={`ur${i}`}>{r[0]} - {r[1]}</div>)
+                                }
+                            </div>
                         </div>
                     </div>
                 )}

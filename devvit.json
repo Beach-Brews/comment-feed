@@ -43,7 +43,8 @@
                 "endpoint": "/internal/jobs/preload"
             },
             "hourly-checks": {
-                "endpoint": "/internal/jobs/hourly-checks"
+                "endpoint": "/internal/jobs/hourly-checks",
+                "cron": "0 * * * *"
             }
         }
     },

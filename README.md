@@ -1,11 +1,10 @@
 # Subreddit Comment Feed
 
-Displays a feed of the most recent comments on your subreddit. Selecting a comment links you to the
-comment. Expanded view (bottom left button) shows up to 25 comments at a time.
+Displays a feed of the most recent comments on your subreddit for all users. Selecting a comment 
+links you to the comment. Expanded view (bottom left button) shows up to 25 comments at a time. 
+Moderators can see reports, with Mod Actions (approve/remove) coming soon.
 
-Simple!
-
-Mod Actions (see reports + approve/remove) coming soon.
+*Tip:* You can Ctrl/Cmd + Click on the *permalink* to open the comment in a new tab!
 
 ![Subreddit Comment Feed Inline](https://i.redd.it/m19roj146ylh1.png)
 ![Subreddit Comment Feed Expanded](https://i.redd.it/ixybc6exlzlh1.png)
@@ -13,7 +12,8 @@ Mod Actions (see reports + approve/remove) coming soon.
 ## Creating the Comment Feed Post
 
 After installing the app, you can create a new Comment Feed post using the "three-dot" menu 
-on the main subreddit page, and choosing "Create Comment Feed"
+on the main subreddit page, and choosing "Create Comment Feed". A new post will be created which
+will show the most recent comment first.
 
 ![Create Comment Feed](https://i.redd.it/uti4j3vamzlh1.png)
 
@@ -23,7 +23,15 @@ Please reach out on [r/CommentFeedApp](https://www.reddit.com/r/CommentFeedApp/)
 
 On install, "new" posts are scanned and comments added until the comment list is 
 populated with 1000 comments. From there, every new comment submitted will be 
-"tracked" by the app. Removed, spam, and deleted comments do not display.
+"tracked" by the app. Removed, spam, and deleted comments do not display. Comment data is cached for
+60 seconds.
+
+## Working Recipe (Feature Roadmap)
+* Mod Actions - Remove comments directly from the comment list.
+* Markdown/Image Support - Ensure formatted text and images appear as expected.
+* User Flair - Display user flair
+* Mod Notes - Easy access to mod notes
+* Realtime Updates - Enable realtime stream mode, where comments appear the second they are added.
 
 ## Settings
 
